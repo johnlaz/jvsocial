@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
 <title>jVox Social Command</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
@@ -29,6 +29,32 @@
   --radius: 6px;
   --radius-lg: 10px;
 }
+
+/* LIGHT THEME */
+[data-theme="light"] {
+  --bg0: #f0f2f7;
+  --bg1: #ffffff;
+  --bg2: #f5f7fc;
+  --bg3: #e8ecf4;
+  --border: #d0d6e8;
+  --border-bright: #b0bacc;
+  --lime: #1fa800;
+  --lime-dim: #178c00;
+  --cyan: #007ab8;
+  --cyan-dim: #005f8f;
+  --amber: #c47a00;
+  --rose: #c8002d;
+  --text: #1a1f2e;
+  --text-dim: #4a5270;
+  --text-muted: #8a94ad;
+}
+[data-theme="light"] body::before { opacity: 0.15; }
+[data-theme="light"] .output-box { background: #f8faff; }
+[data-theme="light"] .status-bar { background: #eef1f9; }
+[data-theme="light"] input,
+[data-theme="light"] textarea,
+[data-theme="light"] select { background: #ffffff; color: var(--text); }
+[data-theme="light"] tr:hover td { background: rgba(0,0,0,0.02); }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -659,14 +685,469 @@ td.date-cell { color: var(--text-muted); font-family: var(--mono); font-size: 12
 .h-meta { font-family: var(--mono); font-size: 11px; color: var(--text-muted); }
 
 /* ─── RESPONSIVE ─── */
-@media (max-width: 600px) {
-  .topbar { padding: 0 14px; }
-  .content { padding: 14px; }
-  .nav-tabs { padding: 0 8px; }
-  .tab { padding: 12px 14px; font-size: 12px; }
+
+/* ─── iOS / MOBILE POLISH ─── */
+* { -webkit-tap-highlight-color: transparent; }
+input, textarea, select, button { touch-action: manipulation; }
+
+/* Prevent iOS zoom on focus — inputs must be >=16px */
+input, textarea, select {
+  font-size: 16px !important;
+}
+/* Restore label sizing (labels aren't inputs) */
+label { font-size: 11px; }
+
+/* Safe area insets for notch + home bar */
+.topbar {
+  padding-left: max(24px, env(safe-area-inset-left));
+  padding-right: max(24px, env(safe-area-inset-right));
+}
+.content {
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+}
+.nav-tabs {
+  padding-left: max(24px, env(safe-area-inset-left));
+  padding-right: max(24px, env(safe-area-inset-right));
+}
+
+/* Minimum tap target size 44px */
+button, .tab, .template-chip, .keyword-chip, .icon-btn, .starter-item {
+  min-height: 44px;
+}
+.btn-sm { min-height: 36px; }
+.tab-badge, .entry-tag { min-height: unset; }
+
+/* ─── HAMBURGER BUTTON ─── */
+.ham-btn { display: none; }
+
+/* ─── MOBILE NAV DRAWER ─── */
+#mobileNavOverlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 500;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+#mobileNavDrawer {
+  position: fixed;
+  top: 0; right: 0; bottom: 0;
+  width: min(280px, 85vw);
+  background: var(--bg1);
+  border-left: 1px solid var(--border-bright);
+  z-index: 600;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: max(20px, env(safe-area-inset-bottom));
+  padding-right: env(safe-area-inset-right);
+}
+#mobileNavDrawer.open { transform: translateX(0); }
+#mobileNavOverlay.open { display: block; }
+.mnav-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.mnav-items { flex: 1; overflow-y: auto; padding: 8px 0; }
+.mnav-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 20px;
+  font-family: var(--head);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: var(--text-dim);
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: all 0.15s;
+  min-height: 52px;
+}
+.mnav-item:hover, .mnav-item.active {
+  color: var(--lime);
+  border-left-color: var(--lime);
+  background: rgba(57,255,20,0.04);
+}
+.mnav-footer { padding: 16px 20px; border-top: 1px solid var(--border); }
+
+/* ─── RESPONSIVE BREAKPOINTS ─── */
+@media (max-width: 640px) {
+  /* Show hamburger, hide tab strip */
+  .ham-btn { display: flex; }
+  .nav-tabs { display: none; }
+  .topbar { padding: 0 14px; height: 52px; }
+  .topbar-brand .brand-sub { display: none; }
+
+  /* Content */
+  .content { padding: 12px; }
+  .card { padding: 14px; }
+
+  /* Stats */
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .stat-chip:not(.always) { display: none; }
+
+  /* Input rows go single column */
+  .input-row { grid-template-columns: 1fr; }
+
+  /* Section titles */
+  .section-title { font-size: 18px; }
+
+  /* Modals — full bottom sheet on mobile */
+  .modal-overlay { align-items: flex-end; padding: 0; }
+  .modal {
+    border-radius: 16px 16px 0 0;
+    max-width: 100%;
+    width: 100%;
+    max-height: 90dvh;
+    overflow-y: auto;
+    padding: 20px 20px max(20px, env(safe-area-inset-bottom));
+  }
+
+  /* Tables → scrollable but with min column widths relaxed */
+  .table-wrap { -webkit-overflow-scrolling: touch; }
+  th, td { padding: 10px 8px; font-size: 12px; }
+  th { font-size: 9px; }
+
+  /* Queue cards */
+  .queue-footer { flex-direction: column; align-items: flex-start; }
+
+  /* Group lib */
+  .group-lib-item { grid-template-columns: 1fr; }
+  .gl-actions { flex-direction: row; justify-content: flex-start; margin-top: 10px; }
+
+  /* Buttons */
+  .btn { padding: 12px 16px; font-size: 13px; }
+  .btn-sm { padding: 8px 12px; font-size: 12px; }
+  .btn-group { gap: 6px; }
+
+  /* Output box */
+  .output-box { font-size: 15px; }
+
+  /* Starter items bigger tap area */
+  .starter-item { padding: 14px; }
+
+  /* Ledger action buttons column */
+  .ledger-row td:last-child .btn { padding: 8px; }
 }
+
+@media (max-width: 380px) {
+  .brand-name { font-size: 14px; }
+  .brand-icon { width: 26px; height: 26px; font-size: 13px; }
+}
+
+
+
+/* ─── LEDGER EXPAND ─── */
+.ledger-row:hover td { background: rgba(57,255,20,0.03); }
+.expand-body {
+  background: var(--bg0);
+  border-top: 1px solid var(--border);
+  padding: 14px 16px;
+}
+.expand-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+.expand-text {
+  font-size: 13px;
+  color: var(--text-dim);
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.7;
+  max-height: 260px;
+  overflow-y: auto;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px;
+}
+/* ─── ENTRY TAGS ─── */
+.entry-tag {
+  display: inline-block;
+  background: rgba(0,229,255,0.1);
+  border: 1px solid rgba(0,229,255,0.25);
+  color: var(--cyan);
+  border-radius: 3px;
+  padding: 1px 6px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  margin-right: 4px;
+  margin-bottom: 2px;
+  white-space: nowrap;
+}
+/* ─── TAG INPUT ─── */
+.tag-input-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  background: var(--bg0);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px 10px;
+  min-height: 42px;
+  cursor: text;
+  transition: border-color 0.15s;
+  margin-bottom: 14px;
+}
+.tag-input-wrap:focus-within { border-color: var(--lime); }
+.tag-pill {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: rgba(0,229,255,0.12);
+  border: 1px solid rgba(0,229,255,0.3);
+  color: var(--cyan);
+  border-radius: 3px;
+  padding: 2px 8px;
+  font-family: var(--mono);
+  font-size: 11px;
+}
+.tag-pill button {
+  background: none; border: none; color: var(--cyan);
+  cursor: pointer; padding: 0; font-size: 12px; line-height: 1;
+  opacity: 0.7;
+}
+.tag-pill button:hover { opacity: 1; }
+.tag-real-input {
+  border: none; background: transparent; color: var(--text);
+  font-size: 13px; outline: none; flex: 1; min-width: 100px;
+  padding: 0; margin: 0; font-family: var(--body);
+}
+
+
+/* ─── GROUP LIBRARY CARDS ─── */
+.group-lib-item {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: start;
+}
+.group-lib-item:hover { border-color: var(--border-bright); }
+.gl-name { font-weight: 600; font-size: 14px; color: var(--text); margin-bottom: 3px; }
+.gl-meta { font-family: var(--mono); font-size: 11px; color: var(--text-muted); margin-bottom: 6px; display:flex; gap:12px; flex-wrap:wrap; }
+.gl-notes { font-size: 13px; color: var(--text-dim); line-height: 1.5; }
+.gl-freq {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em;
+  text-transform: uppercase; padding: 3px 8px; border-radius: 3px;
+  white-space: nowrap;
+}
+.gl-freq.ok   { background: rgba(57,255,20,0.1);  color: var(--lime);  border: 1px solid rgba(57,255,20,0.2); }
+.gl-freq.warn { background: rgba(255,176,32,0.1); color: var(--amber); border: 1px solid rgba(255,176,32,0.2); }
+.gl-freq.cold { background: rgba(255,77,109,0.1); color: var(--rose);  border: 1px solid rgba(255,77,109,0.2); }
+.gl-actions { display: flex; gap: 6px; flex-direction: column; align-items: flex-end; }
+
+/* ─── KEYWORD CHIPS ─── */
+.keyword-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 5px 12px 5px 10px;
+  font-size: 12px; color: var(--text-dim);
+  cursor: default;
+}
+.keyword-chip .kw-cat {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--amber); opacity: 0.8;
+}
+.keyword-chip .kw-del {
+  background: none; border: none; color: var(--text-muted);
+  cursor: pointer; font-size: 14px; padding: 0; line-height: 1;
+}
+.keyword-chip .kw-del:hover { color: var(--rose); }
+
+/* ─── REPLY STARTERS ─── */
+.starter-item {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.starter-item:hover { border-color: var(--lime); }
+.starter-num {
+  font-family: var(--mono); font-size: 11px; color: var(--lime);
+  flex-shrink: 0; padding-top: 2px; width: 18px;
+}
+.starter-text { font-size: 13px; color: var(--text-dim); line-height: 1.6; flex: 1; }
+.starter-copy { flex-shrink: 0; }
+
+/* ─── THEME TOGGLE SWITCH ─── */
+.theme-toggle {
+  width: 48px; height: 26px;
+  background: var(--bg0);
+  border: 1px solid var(--border-bright);
+  border-radius: 13px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  flex-shrink: 0;
+}
+.theme-toggle.light-on {
+  background: var(--lime);
+  border-color: var(--lime);
+}
+.theme-knob {
+  width: 20px; height: 20px;
+  background: var(--text-muted);
+  border-radius: 50%;
+  position: absolute;
+  top: 2px; left: 2px;
+  transition: transform 0.2s, background 0.2s;
+}
+.theme-toggle.light-on .theme-knob {
+  transform: translateX(22px);
+  background: #000;
+}
+
+/* ─── FLOATING ACTION BUTTON ─── */
+.fab {
+  position: fixed;
+  bottom: max(28px, env(safe-area-inset-bottom, 28px));
+  right: max(22px, env(safe-area-inset-right, 22px));
+  width: 58px; height: 58px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--lime), #52ff2e);
+  border: none;
+  box-shadow: 0 4px 20px rgba(57,255,20,0.45), 0 2px 8px rgba(0,0,0,0.4);
+  cursor: pointer;
+  z-index: 400;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.18s, box-shadow 0.18s;
+  -webkit-tap-highlight-color: transparent;
+}
+.fab:hover { transform: scale(1.08); box-shadow: 0 6px 28px rgba(57,255,20,0.6); }
+.fab:active { transform: scale(0.94); }
+.fab-icon { font-size: 24px; line-height: 1; }
+
+/* ─── QUICK CAPTURE MODAL ─── */
+.qc-modal { max-width: 500px; }
+.qc-tabs {
+  display: flex; gap: 6px; margin-bottom: 14px;
+}
+.qc-tab {
+  flex: 1; padding: 9px 12px;
+  font-family: var(--head); font-size: 13px; font-weight: 600;
+  letter-spacing: 0.05em; text-transform: uppercase;
+  background: var(--bg3); color: var(--text-muted);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  cursor: pointer; transition: all 0.15s;
+  min-height: 44px;
+}
+.qc-tab.active {
+  background: rgba(57,255,20,0.1);
+  color: var(--lime);
+  border-color: rgba(57,255,20,0.4);
+}
+.qc-drop-zone {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 6px;
+  border: 2px dashed var(--border-bright);
+  border-radius: var(--radius-lg);
+  padding: 32px 20px;
+  cursor: pointer; transition: all 0.18s;
+  background: var(--bg0); min-height: 140px;
+  text-align: center;
+}
+.qc-drop-zone:hover, .qc-drop-zone.drag-over {
+  border-color: var(--lime);
+  background: rgba(57,255,20,0.04);
+}
+.qc-drop-icon { font-size: 32px; line-height: 1; margin-bottom: 4px; }
+.qc-drop-label { font-family: var(--head); font-size: 15px; font-weight: 600; color: var(--text-dim); }
+.qc-drop-sub { font-family: var(--mono); font-size: 11px; color: var(--text-muted); }
+
+/* ─── CONFIRM CARD ─── */
+.qc-confirm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 800;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.qc-confirm-overlay.show {
+  pointer-events: all;
+  opacity: 1;
+}
+.qc-confirm-card {
+  background: var(--bg1);
+  border: 1px solid var(--border-bright);
+  border-bottom: none;
+  border-radius: 16px 16px 0 0;
+  padding: 20px 20px max(24px, env(safe-area-inset-bottom));
+  width: 100%;
+  max-width: 560px;
+  box-shadow: 0 -8px 40px rgba(0,0,0,0.5);
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.34,1.2,0.64,1);
+}
+.qc-confirm-overlay.show .qc-confirm-card {
+  transform: translateY(0);
+}
+.qc-confirm-header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: 14px; padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.qc-confirm-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.qc-field {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+}
+.qc-field-label {
+  font-family: var(--mono); font-size: 9px;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--text-muted); margin-bottom: 4px;
+}
+.qc-field-val {
+  font-size: 13px; font-weight: 600; color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.qc-field.notes-field {
+  grid-column: 1 / -1;
+}
+.qc-field.notes-field .qc-field-val {
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-weight: 400;
+  color: var(--text-dim);
+  font-size: 12px;
+}
+.qc-confirm-actions {
+  display: flex; gap: 10px;
+}
+
 </style>
 </head>
 <body>
@@ -683,6 +1164,7 @@ td.date-cell { color: var(--text-muted); font-family: var(--mono); font-size: 12
     </div>
   </div>
   <div class="topbar-right">
+    <button class="icon-btn ham-btn" id="hamburgerBtn" onclick="toggleMobileNav()" title="Menu" aria-label="Menu">☰</button>
     <div class="stat-chip always">
       <span>Posts</span>
       <span class="val" id="topStatPosts">0</span>
@@ -695,6 +1177,27 @@ td.date-cell { color: var(--text-muted); font-family: var(--mono); font-size: 12
   </div>
 </header>
 
+
+<!-- MOBILE NAV DRAWER -->
+<div id="mobileNavOverlay" onclick="closeMobileNav()"></div>
+<div id="mobileNavDrawer">
+  <div class="mnav-header">
+    <div class="brand-name" style="color:var(--lime);">MENU</div>
+    <button class="icon-btn" onclick="closeMobileNav()">✕</button>
+  </div>
+  <div class="mnav-items">
+    <div class="mnav-item active" onclick="switchTabMobile('generate')">🪄 <span>Generate</span></div>
+    <div class="mnav-item" onclick="switchTabMobile('queue')">📋 <span>Queue</span> <span class="tab-badge" id="mQueueBadge">0</span></div>
+    <div class="mnav-item" onclick="switchTabMobile('reply')">💬 <span>Reply</span></div>
+    <div class="mnav-item" onclick="switchTabMobile('tracker')">🗺️ <span>Tracker</span></div>
+    <div class="mnav-item" onclick="switchTabMobile('dashboard')">📊 <span>Dashboard</span></div>
+    <div class="mnav-item" onclick="switchTabMobile('strategy')">🎯 <span>Strategy</span></div>
+  </div>
+  <div class="mnav-footer">
+    <button class="btn btn-ghost" style="width:100%;" onclick="openSettings();closeMobileNav();">⚙ Settings</button>
+  </div>
+</div>
+
 <!-- NAV TABS -->
 <nav class="nav-tabs">
   <div class="tab active" onclick="switchTab('generate', this)">🪄 Generate</div>
@@ -702,6 +1205,7 @@ td.date-cell { color: var(--text-muted); font-family: var(--mono); font-size: 12
   <div class="tab" onclick="switchTab('reply', this)">💬 Reply</div>
   <div class="tab" onclick="switchTab('tracker', this)">🗺️ Tracker</div>
   <div class="tab" onclick="switchTab('dashboard', this)">📊 Dashboard</div>
+  <div class="tab" onclick="switchTab('strategy', this)">🎯 Strategy</div>
 </nav>
 
 <!-- CONTENT -->
@@ -842,14 +1346,11 @@ td.date-cell { color: var(--text-muted); font-family: var(--mono); font-size: 12
         ⚠️ You've already replied in this group. Reply will be crafted as a fresh angle.
       </div>
 
-      <div class="card-header" style="margin-top:4px; margin-bottom:10px;"><div class="dot" style="background:var(--text-muted)"></div> Quick Templates</div>
-      <div class="template-list">
-        <span class="template-chip" onclick="loadTemplate('freeRequest')">Free App Request</span>
-        <span class="template-chip" onclick="loadTemplate('summerRoutine')">Summer Routine</span>
-        <span class="template-chip" onclick="loadTemplate('generalParent')">General Parent Post</span>
-        <span class="template-chip" onclick="loadTemplate('therapy')">Therapy/School</span>
-        <span class="template-chip" onclick="loadTemplate('frustrated')">Frustrated Parent</span>
+      <div class="card-header" style="margin-top:4px; margin-bottom:10px; justify-content:space-between;">
+        <span style="display:flex;align-items:center;gap:8px;"><div class="dot" style="background:var(--text-muted)"></div> Quick Templates</span>
+        <button class="btn btn-ghost btn-sm" onclick="openAddTemplate()" style="font-size:11px; padding:4px 10px;">+ Add Template</button>
       </div>
+      <div class="template-list" id="templateChips"></div>
 
       <div class="btn-group">
         <button class="btn btn-primary" onclick="generateReply(false)">🪄 AI-Generate Reply</button>
@@ -942,6 +1443,10 @@ td.date-cell { color: var(--text-muted); font-family: var(--mono); font-size: 12
         <option value="LinkedIn">LinkedIn</option>
       </select>
       <button class="btn btn-ghost btn-sm" onclick="exportLedger()">⬇ Export CSV</button>
+        <label class="btn btn-ghost btn-sm" style="cursor:pointer;margin-bottom:0;">
+          ⬆ Import CSV
+          <input type="file" id="importCSVFile" accept=".csv" style="display:none;" onchange="importCSV(event)">
+        </label>
     </div>
 
     <div class="table-wrap">
@@ -990,19 +1495,103 @@ td.date-cell { color: var(--text-muted); font-family: var(--mono); font-size: 12
     </div>
   </div>
 
+  <!-- ═══ STRATEGY PANEL ═══ -->
+  <div id="panel-strategy" class="panel">
+    <div class="section-header">
+      <div class="section-title">Strategy Hub</div>
+    </div>
+
+    <!-- ── GROUP LIBRARY ── -->
+    <div class="card">
+      <div class="card-header" style="justify-content:space-between;">
+        <span style="display:flex;align-items:center;gap:8px;"><div class="dot"></div> Group Library</span>
+        <button class="btn btn-ghost btn-sm" onclick="openAddGroup()">+ Add Group</button>
+      </div>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">Every Facebook group, subreddit, or community you're active in. Set a posting frequency goal so you know when a group has gone cold.</p>
+      <div id="groupLibraryList">
+        <div class="no-data">No groups saved yet. Add the communities you're in.</div>
+      </div>
+    </div>
+
+    <!-- ── KEYWORD / TRIGGER LIBRARY ── -->
+    <div class="card">
+      <div class="card-header" style="justify-content:space-between;">
+        <span style="display:flex;align-items:center;gap:8px;"><div class="dot" style="background:var(--amber)"></div> Keyword Trigger Library</span>
+        <button class="btn btn-ghost btn-sm" onclick="openAddKeyword()">+ Add Keyword</button>
+      </div>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">Phrases to scan for when scrolling groups manually. When you spot one, you know it's a reply opportunity.</p>
+      <div id="keywordList" style="display:flex;flex-wrap:wrap;gap:8px;min-height:40px;">
+        <div class="no-data" style="width:100%;padding:16px 0;">No keywords saved yet.</div>
+      </div>
+    </div>
+
+    <!-- ── REPLY STARTERS ── -->
+    <div class="card">
+      <div class="card-header"><div class="dot" style="background:var(--cyan)"></div> Reply Starters</div>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">Generate 5 punchy opening lines for a specific situation. Grab one, paste it, finish the reply yourself — or use it as a seed for the AI.</p>
+      <div class="input-row">
+        <div>
+          <label>Situation / Post Type</label>
+          <input type="text" id="starterSituation" placeholder="e.g., parent frustrated with expensive AAC apps">
+        </div>
+        <div>
+          <label>Tone</label>
+          <select id="starterTone">
+            <option value="empathetic">Empathetic</option>
+            <option value="relatable">Relatable / Been there</option>
+            <option value="helpful">Practical & Helpful</option>
+            <option value="excited">Energetic</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="generateStarters()"><span id="starterBtnIcon">⚡</span> <span id="starterBtnText">Generate 5 Starters</span></button>
+      <div id="starterResults" style="margin-top:14px; display:none;">
+        <div class="card-header" style="margin-bottom:10px;"><div class="dot" style="background:var(--cyan)"></div> Pick one and go</div>
+        <div id="starterList"></div>
+      </div>
+      <div id="starterStatus" class="status-bar" style="margin-top:10px;"><div class="pulse idle"></div> Ready — describe the situation above.</div>
+    </div>
+
+    <!-- ── WEEKLY OUTREACH REPORT ── -->
+    <div class="card">
+      <div class="card-header"><div class="dot" style="background:var(--lime)"></div> Weekly Outreach Report</div>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">AI reviews your ledger and tells you exactly what you did, which groups have gone cold, and what to prioritize this week.</p>
+      <button class="btn btn-primary" onclick="generateWeeklyReport()"><span id="reportBtnIcon">📊</span> <span id="reportBtnText">Generate This Week's Report</span></button>
+      <div id="reportOutput" style="margin-top:14px; display:none;">
+        <div class="output-box" id="reportText" style="white-space:pre-wrap; min-height:120px;"></div>
+        <div style="display:flex;gap:8px;margin-top:10px;">
+          <button class="btn btn-sm btn-secondary" onclick="copyReport()">📋 Copy Report</button>
+        </div>
+      </div>
+      <div id="reportStatus" class="status-bar" style="margin-top:10px;"><div class="pulse idle"></div> Ready — generates from your actual ledger data.</div>
+    </div>
+  </div>
+
+
 </main>
 </div>
 
 <!-- ═══ SETTINGS MODAL ═══ -->
 <div class="modal-overlay" id="settingsModal">
   <div class="modal">
+    <form id="settingsForm" onsubmit="saveSettings();return false;" autocomplete="on">
     <div class="modal-title">⚙ Settings</div>
 
     <div>
       <label>Gemini API Key</label>
-      <input type="password" id="settingsApiKey" placeholder="AIza...">
+      <input type="text" name="gemini-username" autocomplete="username" value="gemini-api-key" style="display:none;" aria-hidden="true">
+      <input type="password" id="settingsApiKey" name="gemini-api-key" autocomplete="current-password" placeholder="AIza...">
       <div class="api-key-status" id="apiKeyStatus">
         <span>○</span> No key saved
+      </div>
+    </div>
+
+    <div>
+      <label>Groq API Key <span style="color:var(--text-muted)">(for Quick Capture — free at console.groq.com)</span></label>
+      <input type="text" name="groq-username" autocomplete="username" value="groq-api-key" style="display:none;" aria-hidden="true">
+      <input type="password" id="settingsGroqKey" name="groq-api-key" autocomplete="current-password" placeholder="gsk_...">
+      <div class="api-key-status" id="groqKeyStatus">
+        <span>○</span> No Groq key saved
       </div>
     </div>
 
@@ -1021,9 +1610,200 @@ td.date-cell { color: var(--text-muted); font-family: var(--mono); font-size: 12
       <textarea id="settingsVoice" rows="3" placeholder="e.g., Founder of jVox, dad of a nonverbal child. Warm, authentic, passionate about free AAC tools. Never salesy.">Founder of jVox, a free AAC app built for nonverbal kids. Personal tone — I built this for my own son. Warm, authentic, passionate, never salesy. Always mention it's 100% free and works in any browser.</textarea>
     </div>
 
+    <div style="display:flex; align-items:center; justify-content:space-between; background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius); padding:12px 14px; margin-bottom:14px;">
+      <div>
+        <div style="font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:2px;">Interface Theme</div>
+        <div style="font-size:13px;color:var(--text);" id="themeLabel">Dark Mode</div>
+      </div>
+      <div class="theme-toggle" id="themeToggle" onclick="toggleTheme()">
+        <div class="theme-knob" id="themeKnob"></div>
+      </div>
+    </div>
+
+    <div style="border-top:1px solid var(--border); padding-top:16px; margin-bottom:16px;">
+      <div style="font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;">Data Backup</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-ghost btn-sm" onclick="exportJSON()">⬇ Export Full Backup</button>
+        <label class="btn btn-ghost btn-sm" style="cursor:pointer;margin-bottom:0;">
+          ⬆ Import Backup
+          <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importJSON(event)">
+        </label>
+      </div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:8px;">Exports ledger + queue as JSON. Import merges entries without overwriting duplicates.</div>
+    </div>
+
     <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeSettings()">Cancel</button>
-      <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+      <button class="btn btn-ghost" type="button" onclick="closeSettings()">Cancel</button>
+      <button class="btn btn-primary" type="submit">Save Settings</button>
+    </div>
+    </form>
+  </div>
+</div>
+
+
+
+<!-- ═══ ADD GROUP MODAL ═══ -->
+<div class="modal-overlay" id="addGroupModal">
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-title">➕ Add Group / Community</div>
+    <input type="hidden" id="addGroupEditId">
+    <div class="input-row">
+      <div>
+        <label>Group Name</label>
+        <input type="text" id="addGroupName" placeholder="Nonverbal Kids & AAC Support">
+      </div>
+      <div>
+        <label>Platform</label>
+        <select id="addGroupPlatform">
+          <option value="Facebook">Facebook</option>
+          <option value="Instagram">Instagram</option>
+          <option value="Reddit">Reddit</option>
+          <option value="LinkedIn">LinkedIn</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="input-row">
+      <div>
+        <label>Approx. Members</label>
+        <input type="text" id="addGroupMembers" placeholder="e.g., 12,400">
+      </div>
+      <div>
+        <label>Post Frequency Goal</label>
+        <select id="addGroupFreq">
+          <option value="daily">Daily</option>
+          <option value="2-3x/week" selected>2–3× per week</option>
+          <option value="weekly">Weekly</option>
+          <option value="biweekly">Every 2 weeks</option>
+          <option value="monthly">Monthly</option>
+        </select>
+      </div>
+    </div>
+    <div>
+      <label>URL / Link <span style="color:var(--text-muted)">(optional)</span></label>
+      <input type="text" id="addGroupUrl" placeholder="https://facebook.com/groups/...">
+    </div>
+    <div>
+      <label>Notes <span style="color:var(--text-muted)">(e.g., tone, rules, best post times)</span></label>
+      <textarea id="addGroupNotes" rows="3" placeholder="e.g., Very supportive community, no promotional posts — keep it personal. Active mornings EST."></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeAddGroup()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveGroup()">Save Group</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ADD KEYWORD MODAL ═══ -->
+<div class="modal-overlay" id="addKeywordModal">
+  <div class="modal" style="max-width:440px;">
+    <div class="modal-title">🔍 Add Keyword Trigger</div>
+    <div>
+      <label>Keyword or Phrase</label>
+      <input type="text" id="addKeywordText" placeholder="e.g., nonverbal, AAC app, speech device, PECS">
+    </div>
+    <div>
+      <label>Category <span style="color:var(--text-muted)">(optional)</span></label>
+      <select id="addKeywordCat">
+        <option value="Pain Point">Pain Point</option>
+        <option value="Looking For Tool">Looking For Tool</option>
+        <option value="Therapy">Therapy / School</option>
+        <option value="Milestone">Milestone / Win</option>
+        <option value="Frustration">Frustration</option>
+        <option value="General">General</option>
+      </select>
+    </div>
+    <div>
+      <label>Why it matters <span style="color:var(--text-muted)">(optional reminder to yourself)</span></label>
+      <input type="text" id="addKeywordNote" placeholder="e.g., Parent probably needs a free solution">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeAddKeyword()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveKeyword()">Save Keyword</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ EDIT ENTRY MODAL ═══ -->
+<div class="modal-overlay" id="editEntryModal">
+  <div class="modal" style="max-width:580px;">
+    <div class="modal-title">✏ Edit Entry</div>
+
+    <div class="input-row">
+      <div>
+        <label>Group / Thread</label>
+        <input type="text" id="editGroup" placeholder="Group name" list="groupSuggestions">
+      </div>
+      <div>
+        <label>Platform</label>
+        <select id="editPlatform">
+          <option value="Facebook">Facebook</option>
+          <option value="Instagram">Instagram</option>
+          <option value="X">X / Twitter</option>
+          <option value="Reddit">Reddit</option>
+          <option value="LinkedIn">LinkedIn</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="input-row">
+      <div>
+        <label>Topic / Parent</label>
+        <input type="text" id="editParent" placeholder="Topic or parent reference">
+      </div>
+      <div>
+        <label>Action</label>
+        <select id="editAction">
+          <option value="Commented Post">Commented Post</option>
+          <option value="Sent DM">Sent DM</option>
+          <option value="Resource Post">Resource Post</option>
+          <option value="Replied to Comment">Replied to Comment</option>
+          <option value="Original Post">Original Post</option>
+        </select>
+      </div>
+      <div>
+        <label>Date</label>
+        <input type="date" id="editDate">
+      </div>
+    </div>
+
+    <div>
+      <label>Tags <span style="color:var(--text-muted)">(type and press Enter or comma)</span></label>
+      <div class="tag-input-wrap" id="editTagWrap" onclick="document.getElementById('editTagInput').focus()">
+        <input class="tag-real-input" id="editTagInput" placeholder="Add tag…" autocomplete="off">
+      </div>
+    </div>
+
+    <div>
+      <label>Post Content / Notes</label>
+      <textarea id="editNotes" rows="5" placeholder="Paste the post content here for future reference..."></textarea>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeEditEntry()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEditEntry()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ADD TEMPLATE MODAL ═══ -->
+<div class="modal-overlay" id="addTemplateModal">
+  <div class="modal" style="max-width:560px;">
+    <div class="modal-title">📝 Add Quick Template</div>
+
+    <div>
+      <label>Template Name</label>
+      <input type="text" id="newTplName" placeholder="e.g., Device Recommendation, IEP Season…">
+    </div>
+    <div>
+      <label>Template Content</label>
+      <textarea id="newTplContent" rows="8" placeholder="Write your reply template here. Use it as-is or tweak before sending."></textarea>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeAddTemplate()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveNewTemplate()">Save Template</button>
     </div>
   </div>
 </div>
@@ -1044,7 +1824,7 @@ const DB = {
 let ledger = DB.get('ledger', []);
 let queue  = DB.get('queue', []);
 let settings = DB.get('settings', {
-  apiKey: '', brand: 'jVox', url: 'https://jvox.org',
+  apiKey: '', groqKey: '', brand: 'jVox', url: 'https://jvox.org',
   voice: 'Founder of jVox, a free AAC app built for nonverbal kids. Personal tone — I built this for my own son. Warm, authentic, passionate, never salesy. Always mention it\'s 100% free and works in any browser.'
 });
 
@@ -1064,11 +1844,42 @@ function toast(msg, dur=2500) {
 function switchTab(name, el) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.mnav-item').forEach(t => t.classList.remove('active'));
   document.getElementById('panel-'+name).classList.add('active');
-  el.classList.add('active');
+  if (el) el.classList.add('active');
+  // sync mobile drawer highlight
+  const mItem = document.querySelector(`.mnav-item[onclick*="${name}"]`);
+  if (mItem) mItem.classList.add('active');
   if (name === 'dashboard') renderDashboard();
   if (name === 'tracker') renderLedger();
   if (name === 'queue') renderQueue();
+  if (name === 'strategy') { renderGroupLibrary(); renderKeywords(); }
+  // scroll content to top on tab switch
+  document.querySelector('.content')?.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function switchTabMobile(name) {
+  switchTab(name, null);
+  closeMobileNav();
+}
+
+function toggleMobileNav() {
+  const overlay = document.getElementById('mobileNavOverlay');
+  const drawer  = document.getElementById('mobileNavDrawer');
+  const isOpen  = drawer.classList.contains('open');
+  if (isOpen) {
+    closeMobileNav();
+  } else {
+    overlay.classList.add('open');
+    drawer.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+function closeMobileNav() {
+  document.getElementById('mobileNavOverlay').classList.remove('open');
+  document.getElementById('mobileNavDrawer').classList.remove('open');
+  document.body.style.overflow = '';
 }
 
 // ═══════════════════════════════════════
@@ -1076,15 +1887,23 @@ function switchTab(name, el) {
 // ═══════════════════════════════════════
 function openSettings() {
   document.getElementById('settingsApiKey').value = settings.apiKey || '';
+  document.getElementById('settingsGroqKey').value = settings.groqKey || '';
+  updateGroqKeyStatus();
   document.getElementById('settingsBrand').value = settings.brand || 'jVox';
   document.getElementById('settingsUrl').value = settings.url || 'https://jvox.org';
   document.getElementById('settingsVoice').value = settings.voice || '';
   updateApiKeyStatus();
+  // Sync theme toggle state
+  const toggle = document.getElementById('themeToggle');
+  const label  = document.getElementById('themeLabel');
+  if (toggle) toggle.classList.toggle('light-on', !isDark);
+  if (label)  label.textContent = isDark ? 'Dark Mode' : 'Light Mode';
   document.getElementById('settingsModal').classList.add('open');
 }
 function closeSettings() { document.getElementById('settingsModal').classList.remove('open'); }
 function saveSettings() {
-  settings.apiKey = document.getElementById('settingsApiKey').value.trim();
+  settings.apiKey  = document.getElementById('settingsApiKey').value.trim();
+  settings.groqKey = document.getElementById('settingsGroqKey').value.trim();
   settings.brand  = document.getElementById('settingsBrand').value.trim() || 'jVox';
   settings.url    = document.getElementById('settingsUrl').value.trim() || 'https://jvox.org';
   settings.voice  = document.getElementById('settingsVoice').value.trim();
@@ -1102,6 +1921,17 @@ function updateApiKeyStatus() {
   } else {
     el.className = 'api-key-status';
     el.innerHTML = '<span>○</span> No key saved';
+  }
+}
+function updateGroqKeyStatus() {
+  const el = document.getElementById('groqKeyStatus');
+  if (!el) return;
+  if (settings.groqKey && settings.groqKey.length > 8) {
+    el.className = 'api-key-status ok';
+    el.innerHTML = '<span>●</span> Groq key saved (' + settings.groqKey.slice(0,8) + '…)';
+  } else {
+    el.className = 'api-key-status';
+    el.innerHTML = '<span>○</span> No Groq key saved';
   }
 }
 function checkApiKey() {
@@ -1510,16 +2340,44 @@ function renderLedger() {
   if (!filtered.length) {
     body.innerHTML = `<tr><td colspan="7" class="no-data">No entries match your search.</td></tr>`;
   } else {
-    body.innerHTML = filtered.map(e => `
-      <tr>
+    body.innerHTML = filtered.map(e => {
+      const tags = (e.tags||[]).map(t => `<span class="entry-tag">${esc(t)}</span>`).join('');
+      const notesPreview = (e.notes||'').length > 80 ? esc(e.notes).slice(0,80)+'…' : esc(e.notes||'');
+      return `
+      <tr class="ledger-row" id="lr-${e.id}" style="cursor:pointer;" title="Click to expand">
         <td class="date-cell">${e.date}</td>
         <td><span class="platform-badge ${(e.platform||'').toLowerCase()}">${e.platform||'—'}</span></td>
         <td class="group-cell">${esc(e.group)}</td>
-        <td style="color:var(--text-dim);max-width:160px;overflow:hidden;text-overflow:ellipsis;">${esc(e.parent||'—')}</td>
+        <td style="color:var(--text-dim);font-size:13px;">${esc(e.parent||'—')}</td>
         <td class="action-cell">${esc(e.action)}</td>
-        <td style="color:var(--text-muted);max-width:180px;overflow:hidden;text-overflow:ellipsis;font-size:12px;">${esc(e.notes||'')}</td>
-        <td><button class="btn btn-danger btn-sm" onclick="deleteLog(${e.id})">✕</button></td>
-      </tr>`).join('');
+        <td style="font-size:12px;max-width:200px;">${tags}${tags&&notesPreview?' ':''}<span style="color:var(--text-muted);">${notesPreview}</span></td>
+        <td style="white-space:nowrap;">
+          <div style="display:flex;gap:5px;">
+            <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openEditEntry(${e.id})" title="Edit">✏</button>
+            <button class="btn btn-danger btn-sm" onclick="event.stopPropagation();deleteLog(${e.id})" title="Delete">✕</button>
+          </div>
+        </td>
+      </tr>
+      <tr class="ledger-expand" id="lx-${e.id}" style="display:none;">
+        <td colspan="7" style="padding:0;">
+          <div class="expand-body">
+            <div class="expand-label">Post / Notes</div>
+            <div class="expand-text">${esc(e.notes||'(no content saved)')}</div>
+            <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;align-items:center;">
+              <button class="btn btn-ghost btn-sm" onclick="toggleExpandRow(${e.id})">Collapse ▲</button>
+              <button class="btn btn-secondary btn-sm" onclick="openEditEntry(${e.id})">✏ Edit Entry</button>
+            </div>
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
+    filtered.forEach(e => {
+      const row = document.getElementById('lr-'+e.id);
+      if (row) row.addEventListener('click', function(ev) {
+        if (ev.target.closest('button')) return;
+        toggleExpandRow(e.id);
+      });
+    });
   }
 
   renderGroupSummary();
@@ -1562,11 +2420,71 @@ function exportLedger() {
   toast('⬇ CSV exported!');
 }
 
+function importCSV(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const lines = e.target.result.split('\n').filter(l => l.trim());
+      if (lines.length < 2) throw new Error('No data rows found.');
+      const headers = lines[0].split(',').map(h => h.replace(/^"|"$/g,'').trim().toLowerCase());
+      // Map headers: date, platform, group, topic/parent, action, notes
+      const idx = {
+        date:     headers.findIndex(h => h === 'date'),
+        platform: headers.findIndex(h => h === 'platform'),
+        group:    headers.findIndex(h => h.includes('group')),
+        parent:   headers.findIndex(h => h.includes('topic') || h.includes('parent')),
+        action:   headers.findIndex(h => h === 'action'),
+        notes:    headers.findIndex(h => h === 'notes')
+      };
+      const parseCSVRow = row => {
+        const result = []; let cur = '', inQ = false;
+        for (let i = 0; i < row.length; i++) {
+          const c = row[i];
+          if (c === '"') { if (inQ && row[i+1] === '"') { cur += '"'; i++; } else inQ = !inQ; }
+          else if (c === ',' && !inQ) { result.push(cur); cur = ''; }
+          else cur += c;
+        }
+        result.push(cur);
+        return result;
+      };
+      const existingIds = new Set(ledger.map(l => l.id));
+      let added = 0;
+      lines.slice(1).forEach(line => {
+        if (!line.trim()) return;
+        const cols = parseCSVRow(line);
+        const entry = {
+          id:       Date.now() + Math.random(),
+          date:     idx.date >= 0     ? cols[idx.date]?.replace(/^"|"$/g,'')     : today(),
+          platform: idx.platform >= 0 ? cols[idx.platform]?.replace(/^"|"$/g,'') : 'Other',
+          group:    idx.group >= 0    ? cols[idx.group]?.replace(/^"|"$/g,'')    : '(unknown)',
+          parent:   idx.parent >= 0   ? cols[idx.parent]?.replace(/^"|"$/g,'')  : '',
+          action:   idx.action >= 0   ? cols[idx.action]?.replace(/^"|"$/g,'')  : 'Commented Post',
+          notes:    idx.notes >= 0    ? cols[idx.notes]?.replace(/^"|"$/g,'')   : ''
+        };
+        if (entry.group) { ledger.push(entry); added++; }
+      });
+      DB.set('ledger', ledger);
+      updateTopStats();
+      updateGroupSuggestions();
+      renderLedger();
+      toast(`✅ Imported ${added} CSV rows`);
+    } catch(err) {
+      toast('❌ CSV import failed: ' + err.message);
+    }
+    event.target.value = '';
+  };
+  reader.readAsText(file);
+}
+
 // ═══════════════════════════════════════
 // QUEUE
 // ═══════════════════════════════════════
 function updateQueueBadge() {
   document.getElementById('queueBadge').textContent = queue.length;
+  const mb = document.getElementById('mQueueBadge');
+  if (mb) mb.textContent = queue.length;
 }
 
 function renderQueue() {
@@ -1704,21 +2622,920 @@ function fmtDate(iso) {
   return d.toLocaleDateString('en-US', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
 }
 
+
+// ═══════════════════════════════════════
+// LEDGER ROW EXPAND
+// ═══════════════════════════════════════
+function toggleExpandRow(id) {
+  const row = document.getElementById('lx-'+id);
+  if (!row) return;
+  const isOpen = row.style.display !== 'none';
+  row.style.display = isOpen ? 'none' : 'table-row';
+}
+
+// ═══════════════════════════════════════
+// EDIT ENTRY MODAL
+// ═══════════════════════════════════════
+let editingId = null;
+let editTags = [];
+
+function openEditEntry(id) {
+  const entry = ledger.find(e => e.id === id);
+  if (!entry) return;
+  editingId = id;
+  editTags = [...(entry.tags || [])];
+
+  document.getElementById('editGroup').value    = entry.group || '';
+  document.getElementById('editPlatform').value = entry.platform || 'Facebook';
+  document.getElementById('editParent').value   = entry.parent || '';
+  document.getElementById('editAction').value   = entry.action || 'Commented Post';
+  document.getElementById('editDate').value     = entry.date || today();
+  document.getElementById('editNotes').value    = entry.notes || '';
+
+  renderEditTags();
+  document.getElementById('editEntryModal').classList.add('open');
+
+  // tag input: Enter or comma adds tag
+  const inp = document.getElementById('editTagInput');
+  inp.onkeydown = function(e) {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      const val = inp.value.trim().replace(/,$/, '');
+      if (val && !editTags.includes(val)) { editTags.push(val); renderEditTags(); }
+      inp.value = '';
+    } else if (e.key === 'Backspace' && !inp.value && editTags.length) {
+      editTags.pop(); renderEditTags();
+    }
+  };
+}
+
+function renderEditTags() {
+  const wrap = document.getElementById('editTagWrap');
+  const inp  = document.getElementById('editTagInput');
+  // Remove existing pills
+  wrap.querySelectorAll('.tag-pill').forEach(p => p.remove());
+  editTags.forEach((t, i) => {
+    const pill = document.createElement('span');
+    pill.className = 'tag-pill';
+    pill.innerHTML = esc(t) + `<button onclick="removeEditTag(${i})" title="Remove">×</button>`;
+    wrap.insertBefore(pill, inp);
+  });
+}
+
+function removeEditTag(i) {
+  editTags.splice(i, 1);
+  renderEditTags();
+}
+
+function closeEditEntry() {
+  document.getElementById('editEntryModal').classList.remove('open');
+  editingId = null; editTags = [];
+}
+
+function saveEditEntry() {
+  if (!editingId) return;
+  const idx = ledger.findIndex(e => e.id === editingId);
+  if (idx === -1) return;
+  const group = document.getElementById('editGroup').value.trim();
+  if (!group) { toast('⚠ Group name required'); return; }
+  ledger[idx] = {
+    ...ledger[idx],
+    group,
+    platform: document.getElementById('editPlatform').value,
+    parent:   document.getElementById('editParent').value.trim() || '—',
+    action:   document.getElementById('editAction').value,
+    date:     document.getElementById('editDate').value || today(),
+    notes:    document.getElementById('editNotes').value.trim(),
+    tags:     [...editTags]
+  };
+  DB.set('ledger', ledger);
+  updateGroupSuggestions();
+  updateTopStats();
+  closeEditEntry();
+  renderLedger();
+  toast('✅ Entry updated');
+}
+
+// ═══════════════════════════════════════
+// CUSTOM TEMPLATES
+// ═══════════════════════════════════════
+let customTemplates = DB.get('customTemplates', []);
+// Built-in keys to always show first
+const BUILTIN_KEYS = ['freeRequest','summerRoutine','generalParent','therapy','frustrated'];
+const BUILTIN_LABELS = {
+  freeRequest:   'Free App Request',
+  summerRoutine: 'Summer Routine',
+  generalParent: 'General Parent Post',
+  therapy:       'Therapy/School',
+  frustrated:    'Frustrated Parent'
+};
+
+function renderTemplateChips() {
+  const wrap = document.getElementById('templateChips');
+  if (!wrap) return;
+  let html = BUILTIN_KEYS.map(k =>
+    `<span class="template-chip" onclick="loadTemplate('${k}')">${BUILTIN_LABELS[k]}</span>`
+  ).join('');
+  customTemplates.forEach((t, i) => {
+    html += `<span class="template-chip custom-tpl" style="position:relative;padding-right:28px;">
+      <span onclick="loadCustomTemplate(${i})" style="cursor:pointer;">${esc(t.name)}</span>
+      <button onclick="deleteCustomTemplate(${i})" title="Delete" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--rose);cursor:pointer;font-size:13px;line-height:1;padding:0;">×</button>
+    </span>`;
+  });
+  wrap.innerHTML = html;
+}
+
+function loadCustomTemplate(i) {
+  const t = customTemplates[i];
+  if (!t) return;
+  const el = document.getElementById('replyOutput');
+  const card = document.getElementById('replyOutputCard');
+  el.textContent = t.content;
+  el.classList.remove('placeholder-text');
+  card.style.display = 'block';
+  updateReplyCharCount();
+}
+
+function deleteCustomTemplate(i) {
+  if (!confirm('Delete this template?')) return;
+  customTemplates.splice(i, 1);
+  DB.set('customTemplates', customTemplates);
+  renderTemplateChips();
+  toast('🗑 Template deleted');
+}
+
+function openAddTemplate() {
+  document.getElementById('newTplName').value = '';
+  document.getElementById('newTplContent').value = '';
+  // Pre-fill with current output if there's something generated
+  const cur = document.getElementById('replyOutput')?.textContent?.trim();
+  if (cur) document.getElementById('newTplContent').value = cur;
+  document.getElementById('addTemplateModal').classList.add('open');
+}
+function closeAddTemplate() {
+  document.getElementById('addTemplateModal').classList.remove('open');
+}
+function saveNewTemplate() {
+  const name    = document.getElementById('newTplName').value.trim();
+  const content = document.getElementById('newTplContent').value.trim();
+  if (!name)    { toast('⚠ Template name required'); return; }
+  if (!content) { toast('⚠ Template content required'); return; }
+  customTemplates.push({ name, content });
+  DB.set('customTemplates', customTemplates);
+  renderTemplateChips();
+  closeAddTemplate();
+  toast('✅ Template saved!');
+}
+
+// Close modals on overlay click
+document.getElementById('editEntryModal').addEventListener('click', function(e) {
+  if (e.target === this) closeEditEntry();
+});
+document.getElementById('addTemplateModal').addEventListener('click', function(e) {
+  if (e.target === this) closeAddTemplate();
+});
+
+
+
+// ═══════════════════════════════════════
+// STRATEGY — GROUP LIBRARY
+// ═══════════════════════════════════════
+let groupLibrary = DB.get('groupLibrary', []);
+let keywords     = DB.get('keywords', []);
+
+function openAddGroup(id) {
+  const g = id ? groupLibrary.find(x => x.id === id) : null;
+  document.getElementById('addGroupEditId').value  = id || '';
+  document.getElementById('addGroupName').value    = g?.name    || '';
+  document.getElementById('addGroupPlatform').value= g?.platform|| 'Facebook';
+  document.getElementById('addGroupMembers').value = g?.members || '';
+  document.getElementById('addGroupFreq').value    = g?.freq    || '2-3x/week';
+  document.getElementById('addGroupUrl').value     = g?.url     || '';
+  document.getElementById('addGroupNotes').value   = g?.notes   || '';
+  document.getElementById('addGroupModal').classList.add('open');
+}
+function closeAddGroup() { document.getElementById('addGroupModal').classList.remove('open'); }
+document.getElementById('addGroupModal').addEventListener('click', function(e) { if(e.target===this) closeAddGroup(); });
+
+function saveGroup() {
+  const name = document.getElementById('addGroupName').value.trim();
+  if (!name) { toast('⚠ Group name required'); return; }
+  const editId = document.getElementById('addGroupEditId').value;
+  const entry = {
+    id:       editId ? Number(editId) : Date.now(),
+    name,
+    platform: document.getElementById('addGroupPlatform').value,
+    members:  document.getElementById('addGroupMembers').value.trim(),
+    freq:     document.getElementById('addGroupFreq').value,
+    url:      document.getElementById('addGroupUrl').value.trim(),
+    notes:    document.getElementById('addGroupNotes').value.trim(),
+    added:    editId ? (groupLibrary.find(x=>x.id===Number(editId))?.added || new Date().toISOString()) : new Date().toISOString()
+  };
+  if (editId) {
+    const idx = groupLibrary.findIndex(x => x.id === Number(editId));
+    if (idx >= 0) groupLibrary[idx] = entry; else groupLibrary.push(entry);
+  } else {
+    groupLibrary.push(entry);
+  }
+  DB.set('groupLibrary', groupLibrary);
+  closeAddGroup();
+  renderGroupLibrary();
+  toast('✅ Group saved');
+}
+
+function deleteGroup(id) {
+  if (!confirm('Remove this group?')) return;
+  groupLibrary = groupLibrary.filter(g => g.id !== id);
+  DB.set('groupLibrary', groupLibrary);
+  renderGroupLibrary();
+  toast('🗑 Group removed');
+}
+
+function groupFreqStatus(freq, groupName) {
+  // Find most recent ledger entry for this group
+  const norm = (groupName||'').toLowerCase().trim();
+  const entries = ledger.filter(e => e.group.toLowerCase().trim() === norm);
+  if (!entries.length) return 'cold';
+  const lastDate = entries.reduce((a,b) => new Date(a.date) > new Date(b.date) ? a : b).date;
+  const days = daysDiff(lastDate);
+  const thresholds = { daily:2, '2-3x/week':4, weekly:10, biweekly:18, monthly:35 };
+  const warn = thresholds[freq] || 10;
+  if (days <= warn * 0.7) return 'ok';
+  if (days <= warn * 1.3) return 'warn';
+  return 'cold';
+}
+
+function groupFreqLabel(status) {
+  return { ok:'✓ On Track', warn:'⚡ Post Soon', cold:'❄ Gone Cold' }[status] || '?';
+}
+
+function renderGroupLibrary() {
+  const el = document.getElementById('groupLibraryList');
+  if (!el) return;
+  if (!groupLibrary.length) {
+    el.innerHTML = '<div class="no-data">No groups saved yet. Add the communities you\'re in.</div>';
+    return;
+  }
+  el.innerHTML = groupLibrary.map(g => {
+    const status = groupFreqStatus(g.freq, g.name);
+    const postCount = ledger.filter(e => e.group.toLowerCase().trim() === g.name.toLowerCase().trim()).length;
+    return `
+    <div class="group-lib-item">
+      <div>
+        <div class="gl-name">${esc(g.name)}</div>
+        <div class="gl-meta">
+          <span class="platform-badge ${(g.platform||'').toLowerCase()}" style="font-size:10px;">${g.platform}</span>
+          ${g.members ? `<span>👥 ${esc(g.members)}</span>` : ''}
+          <span>🎯 Goal: ${g.freq}</span>
+          <span>📝 ${postCount} posts logged</span>
+          ${g.url ? `<a href="${esc(g.url)}" target="_blank" style="color:var(--cyan);font-size:11px;">Open Group ↗</a>` : ''}
+        </div>
+        ${g.notes ? `<div class="gl-notes">${esc(g.notes)}</div>` : ''}
+      </div>
+      <div class="gl-actions">
+        <span class="gl-freq ${status}">${groupFreqLabel(status)}</span>
+        <div style="display:flex;gap:5px;margin-top:8px;">
+          <button class="btn btn-ghost btn-sm" onclick="openAddGroup(${g.id})" title="Edit">✏</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteGroup(${g.id})" title="Delete">✕</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════
+// STRATEGY — KEYWORD LIBRARY
+// ═══════════════════════════════════════
+function openAddKeyword() {
+  document.getElementById('addKeywordText').value = '';
+  document.getElementById('addKeywordNote').value = '';
+  document.getElementById('addKeywordModal').classList.add('open');
+  setTimeout(() => document.getElementById('addKeywordText').focus(), 100);
+}
+function closeAddKeyword() { document.getElementById('addKeywordModal').classList.remove('open'); }
+document.getElementById('addKeywordModal').addEventListener('click', function(e) { if(e.target===this) closeAddKeyword(); });
+
+function saveKeyword() {
+  const text = document.getElementById('addKeywordText').value.trim();
+  if (!text) { toast('⚠ Keyword required'); return; }
+  keywords.push({
+    id: Date.now(),
+    text,
+    cat:  document.getElementById('addKeywordCat').value,
+    note: document.getElementById('addKeywordNote').value.trim()
+  });
+  DB.set('keywords', keywords);
+  closeAddKeyword();
+  renderKeywords();
+  toast('✅ Keyword saved');
+}
+
+function deleteKeyword(id) {
+  keywords = keywords.filter(k => k.id !== id);
+  DB.set('keywords', keywords);
+  renderKeywords();
+}
+
+const KW_CAT_COLORS = {
+  'Pain Point':       'var(--rose)',
+  'Looking For Tool': 'var(--lime)',
+  'Therapy':          'var(--cyan)',
+  'Milestone':        'var(--amber)',
+  'Frustration':      'var(--rose)',
+  'General':          'var(--text-muted)'
+};
+
+function renderKeywords() {
+  const el = document.getElementById('keywordList');
+  if (!el) return;
+  if (!keywords.length) {
+    el.innerHTML = '<div class="no-data" style="width:100%;padding:16px 0;">No keywords saved yet.</div>';
+    return;
+  }
+  el.innerHTML = keywords.map(k => `
+    <span class="keyword-chip" title="${esc(k.note||'')}">
+      <span style="color:${KW_CAT_COLORS[k.cat]||'var(--text-dim)'};">●</span>
+      <span>${esc(k.text)}</span>
+      <span class="kw-cat">${esc(k.cat)}</span>
+      <button class="kw-del" onclick="deleteKeyword(${k.id})" title="Remove">×</button>
+    </span>`).join('');
+}
+
+// ═══════════════════════════════════════
+// STRATEGY — REPLY STARTERS
+// ═══════════════════════════════════════
+async function generateStarters() {
+  const situation = document.getElementById('starterSituation').value.trim();
+  if (!situation) { toast('⚠ Describe the situation first'); return; }
+  const tone = document.getElementById('starterTone').value;
+  const toneMap = { empathetic:'empathetic and warm', relatable:'relatable — "been there" energy', helpful:'practical and helpful', excited:'energetic and positive' };
+
+  const prompt = `You are writing social media reply openers for ${settings.brand} (${settings.url}).
+
+Brand voice: ${settings.voice}
+
+Generate exactly 5 short, punchy opening lines for replying to a post about: "${situation}"
+
+Tone: ${toneMap[tone]}
+
+Rules:
+- Each opener is 1 sentence only (max 20 words)
+- They should feel like something a real founder-parent would type, not a marketer
+- Do NOT mention ${settings.brand} or any product — these are just conversation starters
+- Do NOT start any with "I " as the first word
+- Vary the structure: empathize, question, relate, validate, exclaim — one of each type
+- Do NOT number them or add any labels — just 5 lines separated by a blank line
+
+Write only the 5 lines. Nothing else.`;
+
+  setStarterLoading(true);
+  try {
+    const result = await callGemini(prompt);
+    const starters = result.split('\n').map(s => s.trim()).filter(s => s.length > 4);
+    showStarters(starters.slice(0, 5));
+  } catch(e) {
+    setStarterStatus('error', e.message);
+  } finally {
+    setStarterLoading(false);
+  }
+}
+
+let _currentStarters = [];
+
+function showStarters(starters) {
+  _currentStarters = starters;
+  const wrap = document.getElementById('starterResults');
+  const list  = document.getElementById('starterList');
+  wrap.style.display = 'block';
+  list.innerHTML = starters.map((s, i) => `
+    <div class="starter-item" onclick="copyStarterByIndex(${i})">
+      <div class="starter-num">${i+1}</div>
+      <div class="starter-text">${esc(s)}</div>
+      <div class="starter-copy">
+        <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();copyStarterByIndex(${i})">📋</button>
+      </div>
+    </div>`).join('');
+  setStarterStatus('ok', 'Click any line to copy it — then head to the Reply tab to finish.');
+}
+
+function copyStarterByIndex(i) {
+  const text = _currentStarters[i];
+  if (!text) return;
+  navigator.clipboard.writeText(text);
+  toast('📋 Opener copied! Head to Reply tab to finish.');
+}
+
+function setStarterLoading(on) {
+  document.getElementById('starterBtnText').textContent = on ? 'Generating…' : 'Generate 5 Starters';
+  document.getElementById('starterBtnIcon').innerHTML = on ? '<span class="spinner"></span>' : '⚡';
+  setStarterStatus(on ? 'active' : 'idle', on ? 'Calling Gemini…' : '');
+}
+function setStarterStatus(state, msg) {
+  const s = document.getElementById('starterStatus');
+  const dot = state==='active' ? '<div class="pulse"></div>'
+            : state==='ok'     ? '<div class="pulse" style="background:var(--lime);animation:none;"></div>'
+            : state==='error'  ? '<div class="pulse error"></div>'
+            : '<div class="pulse idle"></div>';
+  s.innerHTML = dot + (msg || '');
+}
+
+// ═══════════════════════════════════════
+// STRATEGY — WEEKLY REPORT
+// ═══════════════════════════════════════
+async function generateWeeklyReport() {
+  if (!ledger.length) { toast('⚠ No ledger data yet — log some activity first'); return; }
+
+  // Build context from last 30 days of ledger
+  const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 30);
+  const recent = ledger.filter(e => new Date(e.date) >= cutoff)
+    .sort((a,b) => new Date(b.date) - new Date(a.date));
+  const thisWeek = ledger.filter(e => daysDiff(e.date) <= 7);
+
+  // Group post counts
+  const groupCounts = {};
+  ledger.forEach(e => groupCounts[e.group] = (groupCounts[e.group]||0)+1);
+
+  // Find cold groups from library
+  const coldGroups = groupLibrary.filter(g => groupFreqStatus(g.freq, g.name) === 'cold').map(g => g.name);
+  const warnGroups = groupLibrary.filter(g => groupFreqStatus(g.freq, g.name) === 'warn').map(g => g.name);
+
+  const recentSummary = recent.slice(0,20).map(e =>
+    `${e.date} | ${e.platform} | ${e.group} | ${e.action}${e.parent && e.parent!=='—' ? ' | '+e.parent : ''}`
+  ).join('\n');
+
+  const prompt = `You are a strategic social media advisor for ${settings.brand}, a free AAC app for nonverbal kids.
+
+Founder voice: ${settings.voice}
+
+Analyze this outreach data and generate a concise weekly report:
+
+THIS WEEK (last 7 days): ${thisWeek.length} activities
+LAST 30 DAYS ACTIVITY LOG:
+${recentSummary || 'No recent activity'}
+
+GROUP POST COUNTS (all time):
+${Object.entries(groupCounts).sort((a,b)=>b[1]-a[1]).map(([g,c])=>`${g}: ${c} posts`).join('\n') || 'None'}
+
+${coldGroups.length ? 'COLD GROUPS (overdue per their goal): ' + coldGroups.join(', ') : ''}
+${warnGroups.length ? 'DUE SOON: ' + warnGroups.join(', ') : ''}
+
+Write a practical outreach report with these sections (use plain text, no markdown symbols like ** or ##):
+
+WEEK IN REVIEW
+(2-3 sentences on what was accomplished, what platforms were hit, activity level)
+
+WHAT'S WORKING
+(1-2 specific observations about patterns that look positive)
+
+ATTENTION NEEDED
+(Which groups are cold or overdue, specific callouts)
+
+THIS WEEK'S FOCUS
+(3 concrete, specific action items — actual group names if available, actual post types)
+
+MOMENTUM SCORE
+(Rate outreach momentum 1-10 with one sentence why)
+
+Keep it honest, direct, actionable. Write like a trusted advisor, not a cheerleader.`;
+
+  setReportLoading(true);
+  try {
+    const result = await callGemini(prompt);
+    document.getElementById('reportOutput').style.display = 'block';
+    document.getElementById('reportText').textContent = result;
+    setReportStatus('ok', 'Report generated from your actual ledger data.');
+  } catch(e) {
+    setReportStatus('error', e.message);
+  } finally {
+    setReportLoading(false);
+  }
+}
+
+function copyReport() {
+  navigator.clipboard.writeText(document.getElementById('reportText').textContent);
+  toast('📋 Report copied!');
+}
+
+function setReportLoading(on) {
+  document.getElementById('reportBtnText').textContent = on ? 'Generating…' : "Generate This Week's Report";
+  document.getElementById('reportBtnIcon').innerHTML = on ? '<span class="spinner"></span>' : '📊';
+  setReportStatus(on ? 'active' : 'idle', on ? 'Analyzing your ledger data with Gemini…' : '');
+}
+function setReportStatus(state, msg) {
+  const s = document.getElementById('reportStatus');
+  const dot = state==='active' ? '<div class="pulse"></div>'
+            : state==='ok'     ? '<div class="pulse" style="background:var(--lime);animation:none;"></div>'
+            : state==='error'  ? '<div class="pulse error"></div>'
+            : '<div class="pulse idle"></div>';
+  s.innerHTML = dot + (msg || '');
+}
+
+// ═══════════════════════════════════════
+// THEME
+// ═══════════════════════════════════════
+let isDark = DB.get('theme', 'dark') !== 'light';
+
+function applyTheme() {
+  document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  const toggle = document.getElementById('themeToggle');
+  const label  = document.getElementById('themeLabel');
+  if (toggle) toggle.classList.toggle('light-on', !isDark);
+  if (label)  label.textContent = isDark ? 'Dark Mode' : 'Light Mode';
+}
+
+function toggleTheme() {
+  isDark = !isDark;
+  DB.set('theme', isDark ? 'dark' : 'light');
+  applyTheme();
+}
+
+// Sync toggle state when settings opens — handled inside openSettings directly
+
+// ═══════════════════════════════════════
+// JSON BACKUP / RESTORE
+// ═══════════════════════════════════════
+function exportJSON() {
+  const payload = {
+    version: 1,
+    exported: new Date().toISOString(),
+    ledger,
+    queue
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'jvox-backup-' + today() + '.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast('⬇ Full backup exported!');
+}
+
+function importJSON(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!data.ledger && !data.queue) throw new Error('Invalid backup file format.');
+
+      let addedLedger = 0, addedQueue = 0;
+
+      // Merge ledger — skip entries with same id
+      if (Array.isArray(data.ledger)) {
+        const existingIds = new Set(ledger.map(l => l.id));
+        data.ledger.forEach(entry => {
+          if (!existingIds.has(entry.id)) { ledger.push(entry); addedLedger++; }
+        });
+        DB.set('ledger', ledger);
+      }
+
+      // Merge queue — skip entries with same id
+      if (Array.isArray(data.queue)) {
+        const existingQIds = new Set(queue.map(q => q.id));
+        data.queue.forEach(item => {
+          if (!existingQIds.has(item.id)) { queue.push(item); addedQueue++; }
+        });
+        DB.set('queue', queue);
+      }
+
+      updateTopStats();
+      updateQueueBadge();
+      updateGroupSuggestions();
+      renderLedger();
+      renderQueue();
+      closeSettings();
+      toast(`✅ Imported: +${addedLedger} ledger, +${addedQueue} queue entries`);
+    } catch(err) {
+      toast('❌ Import failed: ' + err.message);
+    }
+    // Reset file input so same file can be re-imported if needed
+    event.target.value = '';
+  };
+  reader.readAsText(file);
+}
+
 // ═══════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════
+applyTheme();
 updateApiKeyStatus();
+updateGroqKeyStatus();
 checkApiKey();
 updateTopStats();
 updateQueueBadge();
 updateGroupSuggestions();
 renderLedger();
 renderQueue();
+renderTemplateChips();
+renderGroupLibrary();
+renderKeywords();
 
 // Close modal on overlay click
 document.getElementById('settingsModal').addEventListener('click', function(e) {
   if (e.target === this) closeSettings();
 });
+
+
+// ═══════════════════════════════════════
+// GROQ API
+// ═══════════════════════════════════════
+async function callGroq(messages, model) {
+  const key = settings.groqKey;
+  if (!key) { openSettings(); throw new Error('No Groq API key. Add one in Settings (free at console.groq.com).'); }
+  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+    body: JSON.stringify({
+      model: model || 'llama-3.3-70b-versatile',
+      messages,
+      temperature: 0.2,
+      max_tokens: 400,
+      response_format: { type: 'json_object' }
+    })
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err?.error?.message || 'Groq API error ' + res.status);
+  }
+  const data = await res.json();
+  return data.choices?.[0]?.message?.content || '{}';
+}
+
+// ═══════════════════════════════════════
+// QUICK CAPTURE
+// ═══════════════════════════════════════
+let qcMode = 'text';
+let qcImageB64 = null;
+let qcImageMime = null;
+let _pendingEntry = null;
+
+function openQuickCapture() {
+  document.getElementById('qcPasteText').value = '';
+  clearQCImage();
+  setQCMode('text');
+  setQCStatus('idle', 'Ready — paste text or upload a screenshot.');
+  document.getElementById('qcParseBtn').disabled = false;
+  document.getElementById('quickCaptureModal').classList.add('open');
+}
+function closeQuickCapture() {
+  document.getElementById('quickCaptureModal').classList.remove('open');
+}
+document.getElementById('quickCaptureModal').addEventListener('click', function(e) {
+  if (e.target === this) closeQuickCapture();
+});
+
+function setQCMode(mode) {
+  qcMode = mode;
+  document.getElementById('qcTextMode').style.display  = mode === 'text'  ? 'block' : 'none';
+  document.getElementById('qcImageMode').style.display = mode === 'image' ? 'block' : 'none';
+  document.getElementById('qcTabText').classList.toggle('active',  mode === 'text');
+  document.getElementById('qcTabImage').classList.toggle('active', mode === 'image');
+}
+
+function handleQCImage(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const dataUrl = e.target.result;
+    qcImageMime = file.type;
+    qcImageB64  = dataUrl.split(',')[1];
+    document.getElementById('qcPreviewImg').src = dataUrl;
+    document.getElementById('qcImagePreview').style.display = 'block';
+    document.getElementById('qcDropZone').style.display = 'none';
+    setQCStatus('ok', 'Image ready — tap Parse to extract post data.');
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearQCImage() {
+  qcImageB64 = null; qcImageMime = null;
+  document.getElementById('qcImagePreview').style.display = 'none';
+  document.getElementById('qcDropZone').style.display = 'flex';
+  document.getElementById('qcFileInput').value = '';
+}
+
+// Drag-and-drop on drop zone
+(function() {
+  const zone = document.getElementById('qcDropZone');
+  zone.addEventListener('dragover',  e => { e.preventDefault(); zone.classList.add('drag-over'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault(); zone.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (!file || !file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      qcImageMime = file.type;
+      qcImageB64  = ev.target.result.split(',')[1];
+      document.getElementById('qcPreviewImg').src = ev.target.result;
+      document.getElementById('qcImagePreview').style.display = 'block';
+      document.getElementById('qcDropZone').style.display = 'none';
+      setQCStatus('ok', 'Image ready — tap Parse.');
+    };
+    reader.readAsDataURL(file);
+  });
+})();
+
+async function runQuickCapture() {
+  const knownGroups = [...new Set(ledger.map(e => e.group)), ...groupLibrary.map(g => g.name)];
+
+  const systemPrompt = `You extract structured data from social media posts or screenshots.
+Return ONLY valid JSON with these exact keys:
+{
+  "group": "best guess at group/community name or empty string",
+  "platform": "Facebook|Instagram|X|Reddit|LinkedIn|Other",
+  "parent": "person name or topic being discussed, brief",
+  "action": "Commented Post|Replied to Comment|Original Post|Sent DM|Resource Post",
+  "date": "YYYY-MM-DD format of today if not clear",
+  "notes": "the full post or comment text, verbatim if possible"
+}
+Known groups to match against if relevant: ${knownGroups.slice(0,20).join(', ') || 'none yet'}.
+Today is ${today()}. Be concise. No markdown, no explanation — just the JSON object.`;
+
+  setQCStatus('active', 'Sending to Groq…');
+  document.getElementById('qcParseBtn').disabled = true;
+
+  try {
+    let raw;
+
+    if (qcMode === 'image' && qcImageB64) {
+      // Vision call — use llama-3.2-11b-vision-preview
+      const messages = [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: [
+          { type: 'image_url', image_url: { url: 'data:' + qcImageMime + ';base64,' + qcImageB64 } },
+          { type: 'text', text: 'Extract the post data from this screenshot and return the JSON.' }
+        ]}
+      ];
+      // Vision models don't support response_format json_object — call differently
+      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + settings.groqKey },
+        body: JSON.stringify({
+          model: 'meta-llama/llama-4-scout-17b-16e-instruct',
+          messages,
+          temperature: 0.1,
+          max_tokens: 500
+        })
+      });
+      if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e?.error?.message||'Groq vision error '+res.status); }
+      const data = await res.json();
+      raw = data.choices?.[0]?.message?.content || '{}';
+    } else {
+      // Text call
+      const text = document.getElementById('qcPasteText').value.trim();
+      if (!text) { setQCStatus('error', 'Nothing to parse — paste some text first.'); document.getElementById('qcParseBtn').disabled = false; return; }
+      const messages = [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: 'Extract data from this post: ' + text }
+      ];
+      raw = await callGroq(messages);
+    }
+
+    // Strip any markdown fences
+    const clean = raw.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(clean);
+
+    _pendingEntry = {
+      id:       Date.now(),
+      group:    parsed.group    || '(unknown group)',
+      platform: parsed.platform || 'Facebook',
+      parent:   parsed.parent   || '',
+      action:   parsed.action   || 'Commented Post',
+      date:     parsed.date     || today(),
+      notes:    parsed.notes    || '',
+      tags:     []
+    };
+
+    closeQuickCapture();
+    showConfirmCard(_pendingEntry);
+
+  } catch(err) {
+    setQCStatus('error', err.message);
+    document.getElementById('qcParseBtn').disabled = false;
+  }
+}
+
+function showConfirmCard(entry) {
+  const fields = [
+    { label: 'Group',    val: entry.group },
+    { label: 'Platform', val: entry.platform },
+    { label: 'Action',   val: entry.action },
+    { label: 'Date',     val: entry.date },
+    { label: 'Topic',    val: entry.parent || '—' },
+    { label: 'Content',  val: entry.notes, wide: true }
+  ];
+  document.getElementById('qcConfirmFields').innerHTML = fields.map(f => `
+    <div class="qc-field${f.wide ? ' notes-field' : ''}">
+      <div class="qc-field-label">${f.label}</div>
+      <div class="qc-field-val">${esc(f.val)}</div>
+    </div>`).join('');
+  document.getElementById('qcConfirmOverlay').classList.add('show');
+}
+
+function dismissConfirm() {
+  document.getElementById('qcConfirmOverlay').classList.remove('show');
+  _pendingEntry = null;
+}
+
+function confirmLog() {
+  if (!_pendingEntry) return;
+  ledger.push(_pendingEntry);
+  DB.set('ledger', ledger);
+  updateGroupSuggestions();
+  updateTopStats();
+  dismissConfirm();
+  toast('✅ Entry logged via Quick Capture!');
+}
+
+function setQCStatus(state, msg) {
+  const s = document.getElementById('qcStatus');
+  const dot = state==='active' ? '<div class="pulse"></div>'
+            : state==='ok'     ? '<div class="pulse" style="background:var(--lime);animation:none;"></div>'
+            : state==='error'  ? '<div class="pulse error"></div>'
+            : '<div class="pulse idle"></div>';
+  s.innerHTML = dot + esc(msg);
+}
+
+// ═══════════════════════════════════════
+// SWIPE TO CLOSE MOBILE NAV
+// ═══════════════════════════════════════
+(function() {
+  let startX = 0, startY = 0;
+  const drawer = document.getElementById('mobileNavDrawer');
+  drawer.addEventListener('touchstart', function(e) {
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+  }, { passive: true });
+  drawer.addEventListener('touchend', function(e) {
+    const dx = e.changedTouches[0].clientX - startX;
+    const dy = Math.abs(e.changedTouches[0].clientY - startY);
+    if (dx > 60 && dy < 40) closeMobileNav(); // swipe right to close
+  }, { passive: true });
+})();
+
 </script>
+
+<!-- ═══ FLOATING QUICK CAPTURE BUTTON ═══ -->
+<button class="fab" id="fabBtn" onclick="openQuickCapture()" title="Quick Capture" aria-label="Quick Capture">
+  <span class="fab-icon">⚡</span>
+</button>
+
+<!-- ═══ QUICK CAPTURE MODAL ═══ -->
+<div class="modal-overlay" id="quickCaptureModal">
+  <div class="modal qc-modal">
+    <div class="modal-title" style="margin-bottom:6px;">⚡ Quick Capture</div>
+    <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">Paste post text or drop a screenshot — Groq will parse it and build the log entry for you.</p>
+
+    <!-- Tab toggle -->
+    <div class="qc-tabs">
+      <button class="qc-tab active" id="qcTabText" onclick="setQCMode('text')">📋 Paste Text</button>
+      <button class="qc-tab" id="qcTabImage" onclick="setQCMode('image')">📷 Screenshot</button>
+    </div>
+
+    <!-- Text mode -->
+    <div id="qcTextMode">
+      <textarea id="qcPasteText" rows="6" placeholder="Paste the post or comment text here…" style="margin-bottom:0;"></textarea>
+    </div>
+
+    <!-- Image mode -->
+    <div id="qcImageMode" style="display:none;">
+      <label class="qc-drop-zone" id="qcDropZone" for="qcFileInput">
+        <div class="qc-drop-icon">📷</div>
+        <div class="qc-drop-label">Tap to choose screenshot</div>
+        <div class="qc-drop-sub">or drag and drop</div>
+        <input type="file" id="qcFileInput" accept="image/*" capture="environment" style="display:none;" onchange="handleQCImage(event)">
+      </label>
+      <div id="qcImagePreview" style="display:none;margin-top:10px;text-align:center;">
+        <img id="qcPreviewImg" style="max-width:100%;max-height:200px;border-radius:var(--radius);border:1px solid var(--border);">
+        <button class="btn btn-ghost btn-sm" style="margin-top:8px;" onclick="clearQCImage()">✕ Clear Image</button>
+      </div>
+    </div>
+
+    <div id="qcStatus" class="status-bar" style="margin-top:12px;"><div class="pulse idle"></div> Ready — paste text or upload a screenshot.</div>
+
+    <div class="modal-footer" style="margin-top:12px;">
+      <button class="btn btn-ghost" onclick="closeQuickCapture()">Cancel</button>
+      <button class="btn btn-primary" id="qcParseBtn" onclick="runQuickCapture()">⚡ Parse &amp; Build Entry</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ QUICK CAPTURE CONFIRM CARD ═══ -->
+<div id="qcConfirmOverlay" class="qc-confirm-overlay">
+  <div class="qc-confirm-card">
+    <div class="qc-confirm-header">
+      <div style="font-family:var(--head);font-size:16px;font-weight:700;color:var(--lime);">✓ Entry Parsed</div>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--text-muted);">Review and confirm</div>
+    </div>
+    <div class="qc-confirm-fields" id="qcConfirmFields"></div>
+    <div class="qc-confirm-actions">
+      <button class="btn btn-ghost" onclick="dismissConfirm()">✕ Discard</button>
+      <button class="btn btn-primary" onclick="confirmLog()" style="flex:1;">✅ Log It</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
