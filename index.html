@@ -1,0 +1,1724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>jVox Social Command</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg0: #0b0c0f;
+  --bg1: #111318;
+  --bg2: #181b22;
+  --bg3: #1f232e;
+  --border: #2a2f3d;
+  --border-bright: #3a4155;
+  --lime: #39ff14;
+  --lime-dim: #2acc10;
+  --cyan: #00e5ff;
+  --cyan-dim: #00b8cc;
+  --amber: #ffb020;
+  --rose: #ff4d6d;
+  --text: #dce3ef;
+  --text-dim: #8a94ad;
+  --text-muted: #4a5168;
+  --mono: 'Share Tech Mono', monospace;
+  --head: 'Rajdhani', sans-serif;
+  --body: 'DM Sans', sans-serif;
+  --radius: 6px;
+  --radius-lg: 10px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  background: var(--bg0);
+  color: var(--text);
+  font-family: var(--body);
+  font-size: 15px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* GRID NOISE OVERLAY */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(57,255,20,0.025) 40px),
+    repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(57,255,20,0.015) 40px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ─── SHELL ─── */
+.shell {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  min-height: 100dvh;
+}
+
+/* ─── TOPBAR ─── */
+.topbar {
+  background: var(--bg1);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  gap: 16px;
+  flex-shrink: 0;
+}
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.brand-icon {
+  width: 30px; height: 30px;
+  background: linear-gradient(135deg, var(--lime), var(--cyan));
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 900; color: #000; font-family: var(--head);
+}
+.brand-name {
+  font-family: var(--head);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--lime);
+}
+.brand-sub {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+.stat-chip {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  display: flex; align-items: center; gap: 6px;
+}
+.stat-chip .val { color: var(--lime); font-weight: 700; }
+.icon-btn {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  width: 36px; height: 36px;
+  border-radius: var(--radius);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.15s;
+}
+.icon-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+
+/* ─── NAV TABS ─── */
+.nav-tabs {
+  background: var(--bg1);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  padding: 0 24px;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  flex-shrink: 0;
+}
+.nav-tabs::-webkit-scrollbar { display: none; }
+.tab {
+  font-family: var(--head);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 14px 20px 13px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: all 0.15s;
+  display: flex; align-items: center; gap: 7px;
+  user-select: none;
+}
+.tab:hover { color: var(--text-dim); }
+.tab.active { color: var(--lime); border-bottom-color: var(--lime); }
+.tab-badge {
+  background: var(--lime);
+  color: #000;
+  border-radius: 10px;
+  padding: 1px 6px;
+  font-size: 10px;
+  font-weight: 700;
+  font-family: var(--mono);
+}
+
+/* ─── MAIN CONTENT ─── */
+.content {
+  padding: 24px;
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+}
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* ─── SECTION HEADER ─── */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 12px;
+}
+.section-title {
+  font-family: var(--head);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--cyan);
+  letter-spacing: 0.04em;
+  display: flex; align-items: center; gap: 10px;
+}
+.section-title::before {
+  content: '//';
+  color: var(--lime);
+  font-family: var(--mono);
+  font-size: 14px;
+}
+
+/* ─── CARDS ─── */
+.card {
+  background: var(--bg1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.card-header {
+  font-family: var(--head);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 14px;
+  display: flex; align-items: center; gap: 8px;
+}
+.card-header .dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--lime);
+}
+
+/* ─── FORM ELEMENTS ─── */
+label {
+  display: block;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 5px;
+}
+input, textarea, select {
+  width: 100%;
+  background: var(--bg0);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 10px 13px;
+  font-size: 14px;
+  font-family: var(--body);
+  border-radius: var(--radius);
+  transition: border-color 0.15s;
+  margin-bottom: 14px;
+  appearance: none;
+}
+input:focus, textarea:focus, select:focus {
+  border-color: var(--lime);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(57,255,20,0.08);
+}
+textarea { resize: vertical; min-height: 100px; }
+.input-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+}
+.input-row > div { display: flex; flex-direction: column; }
+.input-row > div input,
+.input-row > div select,
+.input-row > div textarea { margin-bottom: 0; }
+
+/* ─── BUTTONS ─── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 18px;
+  font-family: var(--head);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: var(--radius);
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.btn-primary { background: var(--lime); color: #000; }
+.btn-primary:hover { background: #52ff2e; transform: translateY(-1px); }
+.btn-secondary { background: transparent; color: var(--cyan); border: 1px solid var(--cyan); }
+.btn-secondary:hover { background: rgba(0,229,255,0.1); }
+.btn-ghost { background: var(--bg3); color: var(--text-dim); border: 1px solid var(--border); }
+.btn-ghost:hover { border-color: var(--border-bright); color: var(--text); }
+.btn-danger { background: transparent; color: var(--rose); border: 1px solid var(--rose); }
+.btn-danger:hover { background: rgba(255,77,109,0.1); }
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+.btn-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+
+/* ─── OUTPUT BOX ─── */
+.output-wrap {
+  position: relative;
+  margin-top: 14px;
+}
+.output-box {
+  background: var(--bg0);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--lime);
+  padding: 16px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  white-space: pre-wrap;
+  min-height: 80px;
+  word-break: break-word;
+}
+.output-box.editable {
+  outline: none;
+  cursor: text;
+}
+.output-box.editable:focus {
+  border-left-color: var(--cyan);
+  box-shadow: 0 0 0 1px rgba(0,229,255,0.1);
+}
+.output-box.placeholder-text { color: var(--text-muted); font-style: italic; }
+.output-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.char-count {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* ─── STATUS INDICATOR ─── */
+.status-bar {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-top: 10px;
+  display: flex; align-items: center; gap: 8px;
+  min-height: 40px;
+}
+.status-bar .pulse {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--lime);
+  animation: pulse 1.5s ease-in-out infinite;
+  flex-shrink: 0;
+}
+.status-bar .pulse.idle { background: var(--text-muted); animation: none; }
+.status-bar .pulse.error { background: var(--rose); animation: none; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+
+/* ─── LEDGER TABLE ─── */
+.ledger-toolbar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.search-wrap { position: relative; flex: 1; min-width: 180px; }
+.search-wrap input { margin-bottom: 0; padding-left: 36px; }
+.search-wrap .search-icon {
+  position: absolute;
+  left: 11px; top: 50%; transform: translateY(-50%);
+  color: var(--text-muted); font-size: 14px;
+  pointer-events: none;
+}
+.table-wrap { overflow-x: auto; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+th, td {
+  border-bottom: 1px solid var(--border);
+  padding: 11px 13px;
+  text-align: left;
+  white-space: nowrap;
+}
+th {
+  background: var(--bg3);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--lime);
+  font-weight: 400;
+}
+tr:hover td { background: rgba(255,255,255,0.02); }
+td.group-cell { font-weight: 600; color: var(--text); }
+td.action-cell { color: var(--cyan); font-family: var(--mono); font-size: 12px; }
+td.date-cell { color: var(--text-muted); font-family: var(--mono); font-size: 12px; }
+.no-data {
+  text-align: center;
+  color: var(--text-muted);
+  font-family: var(--mono);
+  font-size: 12px;
+  padding: 30px;
+}
+
+/* ─── QUEUE CARDS ─── */
+.queue-item {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  position: relative;
+}
+.queue-item:hover { border-color: var(--border-bright); }
+.queue-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+.platform-badge {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.platform-badge.facebook { color: #6aa3ff; border-color: #6aa3ff40; }
+.platform-badge.instagram { color: #f97316; border-color: #f9731640; }
+.platform-badge.x { color: #e0e0e0; border-color: #e0e0e040; }
+.platform-badge.reddit { color: #ff6b35; border-color: #ff6b3540; }
+.platform-badge.linkedin { color: #60a5fa; border-color: #60a5fa40; }
+.purpose-badge {
+  background: rgba(57,255,20,0.1);
+  border: 1px solid rgba(57,255,20,0.2);
+  color: var(--lime);
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.queue-text {
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.6;
+  margin-bottom: 10px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.queue-text.expanded { display: block; }
+.queue-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.queue-time { font-family: var(--mono); font-size: 10px; color: var(--text-muted); }
+
+/* ─── DASHBOARD STATS ─── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.stat-card {
+  background: var(--bg1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  text-align: center;
+}
+.stat-card .s-val {
+  font-family: var(--head);
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--lime);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.stat-card .s-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* ─── GROUP TRACKER ─── */
+.group-item {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 13px 16px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.group-info { flex: 1; min-width: 0; }
+.group-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text);
+  margin-bottom: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.group-platform { font-family: var(--mono); font-size: 11px; color: var(--text-muted); }
+.group-count {
+  font-family: var(--head);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--lime);
+  flex-shrink: 0;
+  line-height: 1;
+  padding-top: 2px;
+}
+.group-count-label { font-family: var(--mono); font-size: 9px; color: var(--text-muted); text-align: right; letter-spacing: 0.1em; text-transform: uppercase; }
+
+/* ─── MODAL ─── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal {
+  background: var(--bg1);
+  border: 1px solid var(--border-bright);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  max-width: 520px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  transform: translateY(12px);
+  transition: transform 0.2s;
+}
+.modal-overlay.open .modal { transform: translateY(0); }
+.modal-title {
+  font-family: var(--head);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--cyan);
+  margin-bottom: 20px;
+  display: flex; align-items: center; gap: 10px;
+}
+.modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+.api-key-status {
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 6px 10px;
+  border-radius: var(--radius);
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  margin-top: -6px;
+  margin-bottom: 14px;
+  display: flex; align-items: center; gap: 6px;
+}
+.api-key-status.ok { color: var(--lime); border-color: rgba(57,255,20,0.3); }
+
+/* ─── TEMPLATE CHIPS ─── */
+.template-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.template-chip {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 5px 13px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.template-chip:hover { border-color: var(--cyan); color: var(--cyan); }
+
+/* ─── LOADING SPINNER ─── */
+.spinner {
+  display: inline-block;
+  width: 14px; height: 14px;
+  border: 2px solid rgba(57,255,20,0.2);
+  border-top-color: var(--lime);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ─── TOAST ─── */
+#toast {
+  position: fixed;
+  bottom: 24px; right: 24px;
+  background: var(--bg2);
+  border: 1px solid var(--lime);
+  border-radius: var(--radius);
+  padding: 12px 18px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--lime);
+  z-index: 9999;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  transform: translateY(80px);
+  opacity: 0;
+  transition: all 0.25s;
+  max-width: 280px;
+}
+#toast.show { transform: translateY(0); opacity: 1; }
+
+/* ─── THREAD ALERT ─── */
+.thread-alert {
+  background: rgba(255,176,32,0.08);
+  border: 1px solid rgba(255,176,32,0.3);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--amber);
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 14px;
+}
+
+/* ─── HISTORY TIMELINE ─── */
+.history-item {
+  display: flex;
+  gap: 14px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.history-item:last-child { border-bottom: none; }
+.h-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--lime); flex-shrink: 0; margin-top: 6px; }
+.h-content { flex: 1; min-width: 0; }
+.h-title { font-size: 13px; color: var(--text); margin-bottom: 2px; }
+.h-meta { font-family: var(--mono); font-size: 11px; color: var(--text-muted); }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 600px) {
+  .topbar { padding: 0 14px; }
+  .content { padding: 14px; }
+  .nav-tabs { padding: 0 8px; }
+  .tab { padding: 12px 14px; font-size: 12px; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .stat-chip:not(.always) { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="topbar-brand">
+    <div class="brand-icon">jV</div>
+    <div>
+      <div class="brand-name">SOCIAL COMMAND</div>
+      <div class="brand-sub">jVox Outreach Platform</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="stat-chip always">
+      <span>Posts</span>
+      <span class="val" id="topStatPosts">0</span>
+    </div>
+    <div class="stat-chip">
+      <span>Groups</span>
+      <span class="val" id="topStatGroups">0</span>
+    </div>
+    <button class="icon-btn" title="Settings" onclick="openSettings()">⚙</button>
+  </div>
+</header>
+
+<!-- NAV TABS -->
+<nav class="nav-tabs">
+  <div class="tab active" onclick="switchTab('generate', this)">🪄 Generate</div>
+  <div class="tab" onclick="switchTab('queue', this)">📋 Queue <span class="tab-badge" id="queueBadge">0</span></div>
+  <div class="tab" onclick="switchTab('reply', this)">💬 Reply</div>
+  <div class="tab" onclick="switchTab('tracker', this)">🗺️ Tracker</div>
+  <div class="tab" onclick="switchTab('dashboard', this)">📊 Dashboard</div>
+</nav>
+
+<!-- CONTENT -->
+<main class="content">
+
+  <!-- ═══ GENERATE PANEL ═══ -->
+  <div id="panel-generate" class="panel active">
+    <div class="section-header">
+      <div class="section-title">Post Generator</div>
+      <div id="apiKeyWarning" class="btn btn-ghost btn-sm" onclick="openSettings()" style="display:none;">⚠ Set Gemini Key</div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><div class="dot"></div> Configuration</div>
+
+      <div class="input-row">
+        <div>
+          <label>Platform</label>
+          <select id="genPlatform">
+            <option value="facebook">Facebook</option>
+            <option value="instagram">Instagram</option>
+            <option value="x">X / Twitter</option>
+            <option value="reddit">Reddit</option>
+            <option value="linkedin">LinkedIn</option>
+          </select>
+        </div>
+        <div>
+          <label>Purpose</label>
+          <select id="genPurpose">
+            <option value="awareness">Awareness / Brand</option>
+            <option value="engagement">Engagement / Discussion</option>
+            <option value="free_offer">Free Tool Offer</option>
+            <option value="reply_comment">Reply / Comment</option>
+            <option value="story">Personal Story</option>
+            <option value="resource">Resource Share</option>
+            <option value="fundraising">Fundraising</option>
+          </select>
+        </div>
+        <div>
+          <label>Tone</label>
+          <select id="genTone">
+            <option value="warm_personal">Warm & Personal</option>
+            <option value="professional">Professional</option>
+            <option value="empathetic">Empathetic</option>
+            <option value="excited">Excited & Energetic</option>
+            <option value="concise">Concise & Direct</option>
+          </select>
+        </div>
+        <div>
+          <label>Length</label>
+          <select id="genLength">
+            <option value="short">Short (1–2 para)</option>
+            <option value="medium" selected>Medium (3–4 para)</option>
+            <option value="long">Long (5+ para)</option>
+            <option value="micro">Micro (&lt;280 chars)</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label>Target Group / Thread <span style="color:var(--text-muted)">(optional — helps dedup check)</span></label>
+        <input type="text" id="genGroup" placeholder="e.g., Nonverbal Kids Support Group" list="groupSuggestions">
+        <datalist id="groupSuggestions"></datalist>
+      </div>
+
+      <div>
+        <label>Additional Context / Notes <span style="color:var(--text-muted)">(optional)</span></label>
+        <textarea id="genContext" rows="2" placeholder="e.g., Focus on summer routines. Keep it conversational. Mention jVox is free."></textarea>
+      </div>
+
+      <div id="duplicateAlert" class="thread-alert" style="display:none;">
+        ⚠️ You've already posted in this group. Generating a variation with different angles to avoid repetition.
+      </div>
+
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="generatePost(false)"><span id="genBtnIcon">🪄</span> <span id="genBtnText">Generate Post</span></button>
+        <button class="btn btn-ghost" onclick="generatePost(true)">🔄 Regenerate</button>
+      </div>
+    </div>
+
+    <div class="card" id="genOutputCard" style="display:none;">
+      <div class="card-header"><div class="dot" style="background:var(--cyan)"></div> Generated Post <span style="color:var(--text-muted);font-size:11px;margin-left:6px;font-family:var(--mono);" id="genPlatformBadge"></span></div>
+      <div class="output-wrap">
+        <div id="genOutput" class="output-box editable" contenteditable="true" spellcheck="true"></div>
+      </div>
+      <div class="output-actions">
+        <span class="char-count" id="genCharCount">0 chars</span>
+        <div class="btn-group" style="margin:0;">
+          <button class="btn btn-sm btn-secondary" onclick="copyGen()">📋 Copy</button>
+          <button class="btn btn-sm btn-ghost" onclick="saveToQueue()">💾 Save to Queue</button>
+          <button class="btn btn-sm btn-ghost" onclick="logFromGen()">✅ Log as Posted</button>
+        </div>
+      </div>
+      <div id="genStatus" class="status-bar" style="margin-top:12px; display:none;"></div>
+    </div>
+
+    <div id="genStatus2" class="status-bar"><div class="pulse idle"></div> Ready — configure and generate a post above.</div>
+  </div>
+
+  <!-- ═══ QUEUE PANEL ═══ -->
+  <div id="panel-queue" class="panel">
+    <div class="section-header">
+      <div class="section-title">Post Queue</div>
+      <button class="btn btn-ghost btn-sm" onclick="clearQueue()">Clear All</button>
+    </div>
+    <div id="queueEmpty" class="no-data" style="padding:40px;">No posts in queue. Generate and save posts above.</div>
+    <div id="queueList"></div>
+  </div>
+
+  <!-- ═══ REPLY PANEL ═══ -->
+  <div id="panel-reply" class="panel">
+    <div class="section-header">
+      <div class="section-title">Reply Generator</div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><div class="dot"></div> Incoming Post</div>
+      <textarea id="replyInput" rows="5" placeholder="Paste the text of the Facebook post or comment here to generate a tailored reply..."></textarea>
+
+      <div class="input-row" style="margin-bottom:14px;">
+        <div>
+          <label>Reply Tone</label>
+          <select id="replyTone">
+            <option value="empathetic">Empathetic & Warm</option>
+            <option value="helpful">Helpful & Practical</option>
+            <option value="excited">Excited About jVox</option>
+            <option value="concise">Short & Natural</option>
+          </select>
+        </div>
+        <div>
+          <label>Group / Thread</label>
+          <input type="text" id="replyGroup" placeholder="Group name (for dedup)" style="margin-bottom:0;" list="groupSuggestions2">
+          <datalist id="groupSuggestions2"></datalist>
+        </div>
+      </div>
+
+      <div id="replyDupAlert" class="thread-alert" style="display:none;">
+        ⚠️ You've already replied in this group. Reply will be crafted as a fresh angle.
+      </div>
+
+      <div class="card-header" style="margin-top:4px; margin-bottom:10px;"><div class="dot" style="background:var(--text-muted)"></div> Quick Templates</div>
+      <div class="template-list">
+        <span class="template-chip" onclick="loadTemplate('freeRequest')">Free App Request</span>
+        <span class="template-chip" onclick="loadTemplate('summerRoutine')">Summer Routine</span>
+        <span class="template-chip" onclick="loadTemplate('generalParent')">General Parent Post</span>
+        <span class="template-chip" onclick="loadTemplate('therapy')">Therapy/School</span>
+        <span class="template-chip" onclick="loadTemplate('frustrated')">Frustrated Parent</span>
+      </div>
+
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="generateReply(false)">🪄 AI-Generate Reply</button>
+        <button class="btn btn-ghost" onclick="generateReply(true)">🔄 Regenerate</button>
+      </div>
+    </div>
+
+    <div class="card" id="replyOutputCard" style="display:none;">
+      <div class="card-header"><div class="dot" style="background:var(--cyan)"></div> Reply Blueprint</div>
+      <div class="output-wrap">
+        <div id="replyOutput" class="output-box editable" contenteditable="true" spellcheck="true"></div>
+      </div>
+      <div class="output-actions">
+        <span class="char-count" id="replyCharCount">0 chars</span>
+        <div class="btn-group" style="margin:0;">
+          <button class="btn btn-sm btn-secondary" onclick="copyReply()">📋 Copy</button>
+          <button class="btn btn-sm btn-ghost" onclick="logReply()">✅ Log as Posted</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="replyStatus" class="status-bar"><div class="pulse idle"></div> Ready — paste a post and generate a reply.</div>
+  </div>
+
+  <!-- ═══ TRACKER PANEL ═══ -->
+  <div id="panel-tracker" class="panel">
+    <div class="section-header">
+      <div class="section-title">Thread Tracker</div>
+    </div>
+
+    <!-- Add Entry Form -->
+    <div class="card">
+      <div class="card-header"><div class="dot"></div> Log Activity</div>
+      <div class="input-row">
+        <div>
+          <label>Group / Thread Name</label>
+          <input type="text" id="logGroup" placeholder="Nonverbal Autism Group" required>
+        </div>
+        <div>
+          <label>Platform</label>
+          <select id="logPlatform">
+            <option value="Facebook">Facebook</option>
+            <option value="Instagram">Instagram</option>
+            <option value="X">X / Twitter</option>
+            <option value="Reddit">Reddit</option>
+            <option value="LinkedIn">LinkedIn</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="input-row">
+        <div>
+          <label>Parent / Topic Reference</label>
+          <input type="text" id="logParent" placeholder="Mary (Summer routine)">
+        </div>
+        <div>
+          <label>Action Taken</label>
+          <select id="logAction">
+            <option value="Commented Post">Commented Post</option>
+            <option value="Sent DM">Sent DM</option>
+            <option value="Resource Post">Resource Post</option>
+            <option value="Replied to Comment">Replied to Comment</option>
+            <option value="Original Post">Original Post</option>
+          </select>
+        </div>
+        <div>
+          <label>Date</label>
+          <input type="date" id="logDate">
+        </div>
+      </div>
+      <div>
+        <label>Notes <span style="color:var(--text-muted)">(optional)</span></label>
+        <textarea id="logNotes" rows="2" placeholder="Any follow-up context..." style="margin-bottom:0;"></textarea>
+      </div>
+      <button class="btn btn-primary" style="width:100%; margin-top:14px;" onclick="addLog()">✅ Log Entry</button>
+    </div>
+
+    <!-- Search & Filter -->
+    <div class="ledger-toolbar">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="ledgerSearch" placeholder="Search groups, topics, actions..." oninput="renderLedger()" style="margin-bottom:0;">
+      </div>
+      <select id="ledgerFilter" onchange="renderLedger()" style="width:auto; margin-bottom:0; min-width:140px;">
+        <option value="">All Platforms</option>
+        <option value="Facebook">Facebook</option>
+        <option value="Instagram">Instagram</option>
+        <option value="X">X / Twitter</option>
+        <option value="Reddit">Reddit</option>
+        <option value="LinkedIn">LinkedIn</option>
+      </select>
+      <button class="btn btn-ghost btn-sm" onclick="exportLedger()">⬇ Export CSV</button>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Platform</th>
+            <th>Group / Thread</th>
+            <th>Topic / Parent</th>
+            <th>Action</th>
+            <th>Notes</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="ledgerBody">
+          <tr><td colspan="7" class="no-data">No entries yet. Log your first activity above.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Group Summary -->
+    <div style="margin-top:24px;">
+      <div class="section-title" style="margin-bottom:14px; font-size:16px;">Active Groups</div>
+      <div id="groupSummary"></div>
+    </div>
+  </div>
+
+  <!-- ═══ DASHBOARD PANEL ═══ -->
+  <div id="panel-dashboard" class="panel">
+    <div class="section-header">
+      <div class="section-title">Dashboard</div>
+      <button class="btn btn-danger btn-sm" onclick="clearAllData()">🗑 Reset All Data</button>
+    </div>
+
+    <div class="stats-grid" id="statsGrid"></div>
+
+    <div class="card">
+      <div class="card-header"><div class="dot"></div> Recent Activity</div>
+      <div id="activityTimeline"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><div class="dot" style="background:var(--amber)"></div> Groups Posted In</div>
+      <div id="dashGroupList"></div>
+    </div>
+  </div>
+
+</main>
+</div>
+
+<!-- ═══ SETTINGS MODAL ═══ -->
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal">
+    <div class="modal-title">⚙ Settings</div>
+
+    <div>
+      <label>Gemini API Key</label>
+      <input type="password" id="settingsApiKey" placeholder="AIza...">
+      <div class="api-key-status" id="apiKeyStatus">
+        <span>○</span> No key saved
+      </div>
+    </div>
+
+    <div>
+      <label>Your Brand / App Name</label>
+      <input type="text" id="settingsBrand" placeholder="jVox" value="jVox">
+    </div>
+
+    <div>
+      <label>App URL</label>
+      <input type="text" id="settingsUrl" placeholder="https://jvox.org" value="https://jvox.org">
+    </div>
+
+    <div>
+      <label>Brand Voice Summary <span style="color:var(--text-muted)">(used in AI prompts)</span></label>
+      <textarea id="settingsVoice" rows="3" placeholder="e.g., Founder of jVox, dad of a nonverbal child. Warm, authentic, passionate about free AAC tools. Never salesy.">Founder of jVox, a free AAC app built for nonverbal kids. Personal tone — I built this for my own son. Warm, authentic, passionate, never salesy. Always mention it's 100% free and works in any browser.</textarea>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeSettings()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════
+// STATE & STORAGE
+// ═══════════════════════════════════════
+const DB = {
+  get(k, fallback=null) { try { return JSON.parse(localStorage.getItem('jvox_sc_'+k)) ?? fallback; } catch { return fallback; } },
+  set(k,v) { localStorage.setItem('jvox_sc_'+k, JSON.stringify(v)); },
+  del(k) { localStorage.removeItem('jvox_sc_'+k); }
+};
+
+let ledger = DB.get('ledger', []);
+let queue  = DB.get('queue', []);
+let settings = DB.get('settings', {
+  apiKey: '', brand: 'jVox', url: 'https://jvox.org',
+  voice: 'Founder of jVox, a free AAC app built for nonverbal kids. Personal tone — I built this for my own son. Warm, authentic, passionate, never salesy. Always mention it\'s 100% free and works in any browser.'
+});
+
+// ═══════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════
+function toast(msg, dur=2500) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), dur);
+}
+
+// ═══════════════════════════════════════
+// TAB SWITCHING
+// ═══════════════════════════════════════
+function switchTab(name, el) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  el.classList.add('active');
+  if (name === 'dashboard') renderDashboard();
+  if (name === 'tracker') renderLedger();
+  if (name === 'queue') renderQueue();
+}
+
+// ═══════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════
+function openSettings() {
+  document.getElementById('settingsApiKey').value = settings.apiKey || '';
+  document.getElementById('settingsBrand').value = settings.brand || 'jVox';
+  document.getElementById('settingsUrl').value = settings.url || 'https://jvox.org';
+  document.getElementById('settingsVoice').value = settings.voice || '';
+  updateApiKeyStatus();
+  document.getElementById('settingsModal').classList.add('open');
+}
+function closeSettings() { document.getElementById('settingsModal').classList.remove('open'); }
+function saveSettings() {
+  settings.apiKey = document.getElementById('settingsApiKey').value.trim();
+  settings.brand  = document.getElementById('settingsBrand').value.trim() || 'jVox';
+  settings.url    = document.getElementById('settingsUrl').value.trim() || 'https://jvox.org';
+  settings.voice  = document.getElementById('settingsVoice').value.trim();
+  DB.set('settings', settings);
+  updateApiKeyStatus();
+  closeSettings();
+  checkApiKey();
+  toast('✅ Settings saved');
+}
+function updateApiKeyStatus() {
+  const el = document.getElementById('apiKeyStatus');
+  if (settings.apiKey && settings.apiKey.length > 8) {
+    el.className = 'api-key-status ok';
+    el.innerHTML = '<span>●</span> Key saved (' + settings.apiKey.slice(0,6) + '…)';
+  } else {
+    el.className = 'api-key-status';
+    el.innerHTML = '<span>○</span> No key saved';
+  }
+}
+function checkApiKey() {
+  document.getElementById('apiKeyWarning').style.display = (!settings.apiKey) ? 'inline-flex' : 'none';
+}
+
+// ═══════════════════════════════════════
+// GEMINI AI CALL
+// ═══════════════════════════════════════
+async function callGemini(prompt) {
+  if (!settings.apiKey) {
+    openSettings();
+    throw new Error('No Gemini API key. Please add one in Settings.');
+  }
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent`;
+  const body = {
+    contents: [{ role: 'user', parts: [{ text: prompt }] }],
+    generationConfig: { temperature: 0.85, maxOutputTokens: 1200 }
+  };
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-goog-api-key': settings.apiKey
+    },
+    body: JSON.stringify(body)
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err?.error?.message || `API error ${res.status}`);
+  }
+  const data = await res.json();
+  return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+}
+
+// ═══════════════════════════════════════
+// DEDUP / GROUP CHECK
+// ═══════════════════════════════════════
+function groupPostedBefore(groupName) {
+  if (!groupName.trim()) return false;
+  const norm = groupName.toLowerCase().trim();
+  return ledger.some(e => e.group.toLowerCase().trim() === norm);
+}
+
+function getGroupPostCount(groupName) {
+  const norm = groupName.toLowerCase().trim();
+  return ledger.filter(e => e.group.toLowerCase().trim() === norm).length;
+}
+
+function updateGroupSuggestions() {
+  const groups = [...new Set(ledger.map(e => e.group))];
+  ['groupSuggestions','groupSuggestions2'].forEach(id => {
+    const dl = document.getElementById(id);
+    if (dl) dl.innerHTML = groups.map(g => `<option value="${esc(g)}">`).join('');
+  });
+}
+
+// ═══════════════════════════════════════
+// POST GENERATOR
+// ═══════════════════════════════════════
+let lastGenPost = '';
+
+document.getElementById('genGroup').addEventListener('input', function() {
+  const dupAlert = document.getElementById('duplicateAlert');
+  dupAlert.style.display = groupPostedBefore(this.value) ? 'flex' : 'none';
+});
+
+async function generatePost(isRegen) {
+  const platform = document.getElementById('genPlatform').value;
+  const purpose  = document.getElementById('genPurpose').value;
+  const tone     = document.getElementById('genTone').value;
+  const length   = document.getElementById('genLength').value;
+  const group    = document.getElementById('genGroup').value.trim();
+  const context  = document.getElementById('genContext').value.trim();
+  const dupCheck = groupPostedBefore(group);
+
+  const platformLabels = { facebook:'Facebook', instagram:'Instagram', x:'X (Twitter)', reddit:'Reddit', linkedin:'LinkedIn' };
+  const purposeLabels  = { awareness:'brand awareness', engagement:'community engagement and discussion', free_offer:'offering a free tool', reply_comment:'a comment reply', story:'sharing a personal founder story', resource:'sharing a resource', fundraising:'fundraising support' };
+  const toneLabels     = { warm_personal:'warm and personal', professional:'professional', empathetic:'deeply empathetic', excited:'excited and energetic', concise:'concise and direct' };
+  const lengthGuide    = { short:'1–2 paragraphs (keep it tight)', medium:'3–4 paragraphs', long:'5+ paragraphs with detail', micro:'under 280 characters, no hashtags' };
+
+  const dupeClause = dupCheck && isRegen
+    ? `IMPORTANT: The user has already posted in this group before. Write a COMPLETELY DIFFERENT angle — different hook, different story detail, different CTA — do NOT repeat the same structure.`
+    : dupCheck
+    ? `Note: This group has been posted in before. Use a fresh angle and different hook.`
+    : '';
+
+  const regenClause = isRegen && lastGenPost
+    ? `The previous version was: """${lastGenPost.slice(0,300)}""". Write something COMPLETELY different — new hook, new structure, new angle.`
+    : '';
+
+  const prompt = `You are a social media copywriter for ${settings.brand} (${settings.url}).
+
+Brand voice: ${settings.voice}
+
+Write a social media post for ${platformLabels[platform]} with these specs:
+- Purpose: ${purposeLabels[purpose]}
+- Tone: ${toneLabels[tone]}
+- Length: ${lengthGuide[length]}
+- Platform: ${platformLabels[platform]}
+${group ? `- Target group/thread: ${group}` : ''}
+${context ? `- Additional context: ${context}` : ''}
+${dupeClause}
+${regenClause}
+
+Platform-specific guidance:
+- Facebook: conversational, emojis ok, can be longer, personal stories work well
+- Instagram: visual language, 3–5 relevant hashtags at end, punchy opening
+- X: punchy, no more than 3 hashtags if any, hook in first 8 words
+- Reddit: NO marketing language, authentic, no emojis, value-first
+- LinkedIn: professional but human, no aggressive CTAs, thought leadership angle
+
+Write ONLY the post content. No preamble, no labels, no quotes around it.`;
+
+  setGenLoading(true);
+  try {
+    const result = await callGemini(prompt);
+    lastGenPost = result;
+    showGenOutput(result, platform, purpose);
+  } catch(e) {
+    setGenStatus('error', e.message);
+  } finally {
+    setGenLoading(false);
+  }
+}
+
+function showGenOutput(text, platform, purpose) {
+  const card = document.getElementById('genOutputCard');
+  const out  = document.getElementById('genOutput');
+  const badge = document.getElementById('genPlatformBadge');
+  card.style.display = 'block';
+  out.textContent = text;
+  out.classList.remove('placeholder-text');
+  badge.textContent = `${platform.toUpperCase()} · ${purpose.replace('_',' ')}`;
+  updateGenCharCount();
+  document.getElementById('genStatus2').style.display = 'none';
+  setGenStatus('ok', `Post generated for ${platform}. Edit inline if needed.`);
+}
+
+function setGenLoading(on) {
+  document.getElementById('genBtnText').textContent = on ? 'Generating…' : 'Generate Post';
+  document.getElementById('genBtnIcon').innerHTML = on ? '<span class="spinner"></span>' : '🪄';
+  setGenStatus(on ? 'active' : 'idle', on ? 'Calling Gemini AI…' : '');
+}
+
+function setGenStatus(state, msg) {
+  const s = document.getElementById('genStatus2');
+  const dot = state === 'active' ? '<div class="pulse"></div>'
+            : state === 'ok'     ? '<div class="pulse" style="background:var(--lime);animation:none;"></div>'
+            : state === 'error'  ? '<div class="pulse error"></div>'
+            : '<div class="pulse idle"></div>';
+  s.style.display = msg ? 'flex' : 'none';
+  s.innerHTML = dot + msg;
+}
+
+function updateGenCharCount() {
+  const out = document.getElementById('genOutput');
+  document.getElementById('genCharCount').textContent = (out.textContent || '').length + ' chars';
+}
+document.getElementById('genOutput').addEventListener('input', updateGenCharCount);
+
+function copyGen() {
+  const t = document.getElementById('genOutput').textContent;
+  if (!t) return;
+  navigator.clipboard.writeText(t);
+  toast('📋 Copied to clipboard!');
+}
+
+function saveToQueue() {
+  const text = document.getElementById('genOutput').textContent.trim();
+  if (!text) return;
+  queue.push({
+    id: Date.now(),
+    text,
+    platform: document.getElementById('genPlatform').value,
+    purpose:  document.getElementById('genPurpose').value,
+    group:    document.getElementById('genGroup').value.trim(),
+    created:  new Date().toISOString()
+  });
+  DB.set('queue', queue);
+  updateQueueBadge();
+  toast('💾 Saved to Queue!');
+}
+
+function logFromGen() {
+  const group = document.getElementById('genGroup').value.trim() || '(no group)';
+  const text  = document.getElementById('genOutput').textContent.trim();
+  if (!text) { toast('⚠ Generate a post first'); return; }
+  addLogEntry({
+    group,
+    platform: capitalise(document.getElementById('genPlatform').value),
+    parent: 'Generated post · ' + document.getElementById('genPurpose').value.replace('_',' '),
+    action: 'Original Post',
+    date: today(),
+    notes: text.slice(0, 120) + (text.length > 120 ? '…' : '')
+  });
+  toast('✅ Logged as posted!');
+}
+
+// ═══════════════════════════════════════
+// REPLY GENERATOR
+// ═══════════════════════════════════════
+let lastReply = '';
+
+document.getElementById('replyGroup').addEventListener('input', function() {
+  document.getElementById('replyDupAlert').style.display = groupPostedBefore(this.value) ? 'flex' : 'none';
+});
+
+const TEMPLATES = {
+  generalParent: `If I can't solve the problem, I'm going to make an impact.
+
+For 6 years, I've been trying to bridge the communication gap for my son. I've realized introducing technology has to happen organically and in stages—building comfort first, without pressure.
+
+That mindset is why I built jVox—a modern, zero-friction app designed to completely raise the bar for what our community deserves. 🧩
+
+jVox was built for children or young adults frustrated by slow, outdated AAC tools. It runs directly in your browser on any phone or tablet, it's 100% free, and it's ready to test right now at jvox.org.
+
+My goal: make jVox an incredible resource that makes life better for all of our non-verbal kids. But I need your help.
+
+If you have a moment, try jVox for 5–10 minutes and tell me what would make it life-changing for your family.
+
+👉 jvox.org`,
+
+  freeRequest: `I was in your exact shoes with my son and got so tired of the limitations and costs that I stepped completely out of my comfort zone to build a solution.
+
+It's a completely free app called jVox.
+
+It runs directly in the browser of any phone or tablet you already own—no heavy hardware, no credit cards. It's designed to be ultra-fast and zero-friction so kids can build words into sentences at their own pace.
+
+Feel free to check it out! → jvox.org`,
+
+  summerRoutine: `Congratulations on getting the devices! Summer is the perfect, low-pressure window to build comfort.
+
+To make it feel less like "work" at home—this is the exact hurdle we faced with my son. When he used the heavy "school/therapy" setup, he rejected it because it felt like a speech lesson.
+
+I finally got so frustrated that I built a free, zero-friction app called jVox to bridge exactly this gap.
+
+Because it's fast and runs right in the browser of any phone or tablet you already own, it makes casual home use so much easier.
+
+Feel free to give it a look for your summer routine! → jvox.org`,
+
+  therapy: `Therapy progress is such a milestone—congrats! The tricky part is always keeping that momentum going between sessions.
+
+What worked for us was having something lightweight and pressure-free for home. I ended up building a free browser-based AAC app called jVox specifically because everything else felt too clinical or expensive.
+
+No download, no login, works on any phone or tablet. Might be a nice complement to the therapy work → jvox.org`,
+
+  frustrated: `Ugh, I felt this post in my soul. That frustration is exactly what drove me to build something instead of waiting for a solution.
+
+I'm the dad of a nonverbal kid and I built a free AAC app called jVox because I was done waiting. No subscriptions, no expensive hardware—just opens in your browser and works.
+
+I'm not here to sell anything, just genuinely want to help. If it's useful for your family, amazing. → jvox.org`
+};
+
+function loadTemplate(name) {
+  const el = document.getElementById('replyOutput');
+  const card = document.getElementById('replyOutputCard');
+  el.textContent = TEMPLATES[name] || '';
+  el.classList.remove('placeholder-text');
+  card.style.display = 'block';
+  updateReplyCharCount();
+}
+
+async function generateReply(isRegen) {
+  const input = document.getElementById('replyInput').value.trim();
+  if (!input) { toast('⚠ Paste a post first'); return; }
+
+  const tone   = document.getElementById('replyTone').value;
+  const group  = document.getElementById('replyGroup').value.trim();
+  const toneLabels = { empathetic:'empathetic and warm', helpful:'helpful and practical', excited:'excited about jVox', concise:'short and natural (2–3 sentences max)' };
+  const regenClause = isRegen && lastReply ? `Previous reply was: "${lastReply.slice(0,200)}". Write something DIFFERENT.` : '';
+
+  const prompt = `You are replying to a Facebook community post on behalf of ${settings.brand} founder.
+
+Brand voice: ${settings.voice}
+App URL: ${settings.url}
+
+The post you're replying to:
+"""
+${input}
+"""
+
+Write a ${toneLabels[tone]} reply that:
+- Acknowledges their situation with empathy first
+- Naturally (not forcefully) mentions ${settings.brand} as a free resource if genuinely relevant
+- Ends with the URL (${settings.url}) only if mentioning the app
+- Feels like a real person commenting, NOT a marketing bot
+- Does NOT start with "I" as the first word
+- Is appropriately concise for a comment reply
+
+${regenClause}
+
+Write ONLY the reply text. No labels, no quotes.`;
+
+  setReplyLoading(true);
+  try {
+    const result = await callGemini(prompt);
+    lastReply = result;
+    showReplyOutput(result);
+  } catch(e) {
+    setReplyStatus('error', e.message);
+  } finally {
+    setReplyLoading(false);
+  }
+}
+
+function showReplyOutput(text) {
+  const card = document.getElementById('replyOutputCard');
+  const out  = document.getElementById('replyOutput');
+  card.style.display = 'block';
+  out.textContent = text;
+  out.classList.remove('placeholder-text');
+  updateReplyCharCount();
+  setReplyStatus('ok', 'Reply generated. Edit inline, then copy or log.');
+}
+
+function setReplyLoading(on) {
+  setReplyStatus(on ? 'active' : 'idle', on ? 'Calling Gemini AI…' : 'Ready — paste a post and generate a reply.');
+}
+function setReplyStatus(state, msg) {
+  const s = document.getElementById('replyStatus');
+  const dot = state === 'active' ? '<div class="pulse"></div>'
+            : state === 'ok'     ? '<div class="pulse" style="background:var(--lime);animation:none;"></div>'
+            : state === 'error'  ? '<div class="pulse error"></div>'
+            : '<div class="pulse idle"></div>';
+  s.innerHTML = dot + msg;
+}
+function updateReplyCharCount() {
+  const out = document.getElementById('replyOutput');
+  document.getElementById('replyCharCount').textContent = (out.textContent || '').length + ' chars';
+}
+document.getElementById('replyOutput').addEventListener('input', updateReplyCharCount);
+
+function copyReply() {
+  const t = document.getElementById('replyOutput').textContent;
+  if (!t) return;
+  navigator.clipboard.writeText(t);
+  toast('📋 Copied!');
+}
+
+function logReply() {
+  const group = document.getElementById('replyGroup').value.trim() || '(no group)';
+  const text  = document.getElementById('replyOutput').textContent.trim();
+  if (!text) { toast('⚠ Generate a reply first'); return; }
+  addLogEntry({
+    group,
+    platform: 'Facebook',
+    parent: 'Reply to post',
+    action: 'Replied to Comment',
+    date: today(),
+    notes: text.slice(0, 120) + (text.length > 120 ? '…' : '')
+  });
+  toast('✅ Logged!');
+}
+
+// ═══════════════════════════════════════
+// LEDGER
+// ═══════════════════════════════════════
+document.getElementById('logDate').value = today();
+
+function addLog() {
+  const group = document.getElementById('logGroup').value.trim();
+  if (!group) { toast('⚠ Group name required'); return; }
+  addLogEntry({
+    group,
+    platform: document.getElementById('logPlatform').value,
+    parent:   document.getElementById('logParent').value.trim() || '—',
+    action:   document.getElementById('logAction').value,
+    date:     document.getElementById('logDate').value || today(),
+    notes:    document.getElementById('logNotes').value.trim()
+  });
+  document.getElementById('logGroup').value = '';
+  document.getElementById('logParent').value = '';
+  document.getElementById('logNotes').value = '';
+  toast('✅ Entry logged');
+  renderLedger();
+}
+
+function addLogEntry(entry) {
+  ledger.push({ id: Date.now(), ...entry });
+  DB.set('ledger', ledger);
+  updateGroupSuggestions();
+  updateTopStats();
+}
+
+function deleteLog(id) {
+  if (!confirm('Remove this entry?')) return;
+  ledger = ledger.filter(e => e.id !== id);
+  DB.set('ledger', ledger);
+  renderLedger();
+  updateTopStats();
+  toast('🗑 Entry removed');
+}
+
+function renderLedger() {
+  const search = (document.getElementById('ledgerSearch').value || '').toLowerCase();
+  const filter = document.getElementById('ledgerFilter').value;
+
+  let filtered = ledger.filter(e => {
+    const matchSearch = !search || [e.group, e.parent, e.action, e.platform, e.notes].some(v => (v||'').toLowerCase().includes(search));
+    const matchFilter = !filter || e.platform === filter;
+    return matchSearch && matchFilter;
+  }).sort((a,b) => new Date(b.date) - new Date(a.date) || b.id - a.id);
+
+  const body = document.getElementById('ledgerBody');
+  if (!filtered.length) {
+    body.innerHTML = `<tr><td colspan="7" class="no-data">No entries match your search.</td></tr>`;
+  } else {
+    body.innerHTML = filtered.map(e => `
+      <tr>
+        <td class="date-cell">${e.date}</td>
+        <td><span class="platform-badge ${(e.platform||'').toLowerCase()}">${e.platform||'—'}</span></td>
+        <td class="group-cell">${esc(e.group)}</td>
+        <td style="color:var(--text-dim);max-width:160px;overflow:hidden;text-overflow:ellipsis;">${esc(e.parent||'—')}</td>
+        <td class="action-cell">${esc(e.action)}</td>
+        <td style="color:var(--text-muted);max-width:180px;overflow:hidden;text-overflow:ellipsis;font-size:12px;">${esc(e.notes||'')}</td>
+        <td><button class="btn btn-danger btn-sm" onclick="deleteLog(${e.id})">✕</button></td>
+      </tr>`).join('');
+  }
+
+  renderGroupSummary();
+  updateGroupSuggestions();
+}
+
+function renderGroupSummary() {
+  const counts = {};
+  const platforms = {};
+  ledger.forEach(e => {
+    counts[e.group] = (counts[e.group]||0) + 1;
+    platforms[e.group] = e.platform;
+  });
+  const sorted = Object.entries(counts).sort((a,b) => b[1]-a[1]);
+  const el = document.getElementById('groupSummary');
+  if (!sorted.length) { el.innerHTML = '<div class="no-data">No groups tracked yet.</div>'; return; }
+  el.innerHTML = sorted.map(([g, c]) => `
+    <div class="group-item">
+      <div class="group-info">
+        <div class="group-name">${esc(g)}</div>
+        <div class="group-platform">${platforms[g] || ''}</div>
+      </div>
+      <div>
+        <div class="group-count">${c}</div>
+        <div class="group-count-label">posts</div>
+      </div>
+    </div>`).join('');
+}
+
+function exportLedger() {
+  const rows = [['Date','Platform','Group','Topic','Action','Notes']];
+  ledger.sort((a,b) => new Date(b.date)-new Date(a.date)).forEach(e => {
+    rows.push([e.date, e.platform, e.group, e.parent, e.action, (e.notes||'').replace(/\n/g,' ')]);
+  });
+  const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'jvox-outreach-' + today() + '.csv';
+  a.click();
+  toast('⬇ CSV exported!');
+}
+
+// ═══════════════════════════════════════
+// QUEUE
+// ═══════════════════════════════════════
+function updateQueueBadge() {
+  document.getElementById('queueBadge').textContent = queue.length;
+}
+
+function renderQueue() {
+  const list  = document.getElementById('queueList');
+  const empty = document.getElementById('queueEmpty');
+  if (!queue.length) { empty.style.display = 'block'; list.innerHTML = ''; return; }
+  empty.style.display = 'none';
+  list.innerHTML = queue.map((item, idx) => `
+    <div class="queue-item" id="qi-${item.id}">
+      <div class="queue-meta">
+        <span class="platform-badge ${item.platform}">${item.platform.toUpperCase()}</span>
+        <span class="purpose-badge">${(item.purpose||'').replace('_',' ')}</span>
+        ${item.group ? `<span style="font-family:var(--mono);font-size:11px;color:var(--text-muted);">→ ${esc(item.group)}</span>` : ''}
+      </div>
+      <div class="queue-text" id="qt-${item.id}">${esc(item.text)}</div>
+      <div class="queue-footer">
+        <span class="queue-time">${fmtDate(item.created)}</span>
+        <div class="btn-group" style="margin:0;">
+          <button class="btn btn-sm btn-ghost" onclick="toggleExpand(${item.id})">Expand</button>
+          <button class="btn btn-sm btn-secondary" onclick="copyQueueItem(${item.id})">📋 Copy</button>
+          <button class="btn btn-sm btn-ghost" onclick="logQueueItem(${item.id})">✅ Log Posted</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteQueueItem(${item.id})">✕</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function toggleExpand(id) {
+  document.getElementById('qt-'+id)?.classList.toggle('expanded');
+}
+
+function copyQueueItem(id) {
+  const item = queue.find(q => q.id === id);
+  if (!item) return;
+  navigator.clipboard.writeText(item.text);
+  toast('📋 Copied!');
+}
+
+function logQueueItem(id) {
+  const item = queue.find(q => q.id === id);
+  if (!item) return;
+  addLogEntry({
+    group:    item.group || '(no group)',
+    platform: capitalise(item.platform),
+    parent:   'Queue post · ' + item.purpose.replace('_',' '),
+    action:   'Original Post',
+    date:     today(),
+    notes:    item.text.slice(0, 120) + (item.text.length > 120 ? '…' : '')
+  });
+  deleteQueueItem(id);
+  toast('✅ Logged and removed from queue!');
+}
+
+function deleteQueueItem(id) {
+  queue = queue.filter(q => q.id !== id);
+  DB.set('queue', queue);
+  updateQueueBadge();
+  renderQueue();
+}
+
+function clearQueue() {
+  if (!queue.length) return;
+  if (!confirm('Clear all queued posts?')) return;
+  queue = [];
+  DB.set('queue', queue);
+  updateQueueBadge();
+  renderQueue();
+  toast('🗑 Queue cleared');
+}
+
+// ═══════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════
+function renderDashboard() {
+  const total   = ledger.length;
+  const groups  = new Set(ledger.map(e => e.group)).size;
+  const dms     = ledger.filter(e => e.action === 'Sent DM').length;
+  const week    = ledger.filter(e => daysDiff(e.date) <= 7).length;
+
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="stat-card"><div class="s-val">${total}</div><div class="s-label">Total Posts</div></div>
+    <div class="stat-card"><div class="s-val">${groups}</div><div class="s-label">Groups Reached</div></div>
+    <div class="stat-card"><div class="s-val">${dms}</div><div class="s-label">DMs Sent</div></div>
+    <div class="stat-card"><div class="s-val">${week}</div><div class="s-label">This Week</div></div>
+  `;
+
+  const recent = [...ledger].sort((a,b) => new Date(b.date)-new Date(a.date) || b.id-a.id).slice(0,10);
+  const timeline = document.getElementById('activityTimeline');
+  if (!recent.length) {
+    timeline.innerHTML = '<div class="no-data">No activity logged yet.</div>';
+  } else {
+    timeline.innerHTML = recent.map(e => `
+      <div class="history-item">
+        <div class="h-dot"></div>
+        <div class="h-content">
+          <div class="h-title"><strong>${esc(e.group)}</strong> — ${esc(e.action)}</div>
+          <div class="h-meta">${e.date} · ${e.platform}${e.parent && e.parent !== '—' ? ' · ' + esc(e.parent) : ''}</div>
+        </div>
+      </div>`).join('');
+  }
+
+  const counts = {};
+  ledger.forEach(e => counts[e.group] = (counts[e.group]||0)+1);
+  const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const dgList = document.getElementById('dashGroupList');
+  dgList.innerHTML = sorted.map(([g,c]) => `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);">
+      <span style="font-size:13px;">${esc(g)}</span>
+      <span style="font-family:var(--mono);font-size:12px;color:var(--lime);">${c} posts</span>
+    </div>`).join('') || '<div class="no-data">No data.</div>';
+}
+
+function updateTopStats() {
+  document.getElementById('topStatPosts').textContent  = ledger.length;
+  document.getElementById('topStatGroups').textContent = new Set(ledger.map(e => e.group)).size;
+}
+
+function clearAllData() {
+  if (!confirm('⚠ This will delete ALL ledger entries, queue posts, and settings. Are you sure?')) return;
+  ['ledger','queue','settings'].forEach(k => DB.del(k));
+  ledger = []; queue = []; settings = { apiKey:'', brand:'jVox', url:'https://jvox.org', voice:'' };
+  updateTopStats(); updateQueueBadge(); renderLedger(); renderQueue(); renderDashboard();
+  toast('🗑 All data cleared');
+}
+
+// ═══════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function today() { return new Date().toISOString().split('T')[0]; }
+function capitalise(s) { return s ? s[0].toUpperCase()+s.slice(1) : s; }
+function daysDiff(d) { return Math.floor((Date.now() - new Date(d).getTime()) / 86400000); }
+function fmtDate(iso) {
+  const d = new Date(iso);
+  return d.toLocaleDateString('en-US', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+}
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+updateApiKeyStatus();
+checkApiKey();
+updateTopStats();
+updateQueueBadge();
+updateGroupSuggestions();
+renderLedger();
+renderQueue();
+
+// Close modal on overlay click
+document.getElementById('settingsModal').addEventListener('click', function(e) {
+  if (e.target === this) closeSettings();
+});
+</script>
+</body>
+</html>
