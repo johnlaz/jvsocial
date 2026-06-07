@@ -1153,6 +1153,60 @@ button, .tab, .template-chip, .keyword-chip, .icon-btn, .starter-item {
 }
 
 
+/* ─── INTENT TOGGLE (Quick Capture) ─── */
+.intent-toggle {
+  display: flex; gap: 6px; margin-bottom: 14px;
+}
+.intent-btn {
+  flex: 1; padding: 10px 8px;
+  font-family: var(--head); font-size: 12px; font-weight: 600;
+  letter-spacing: 0.04em; text-transform: uppercase;
+  background: var(--bg3); color: var(--text-muted);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  cursor: pointer; transition: all 0.15s; line-height: 1.3;
+  min-height: 52px; text-align: center;
+}
+.intent-btn.active-post   { background: rgba(231,187,90,0.12); color: var(--lime);  border-color: rgba(231,187,90,0.5); }
+.intent-btn.active-req    { background: rgba(194,167,137,0.15); color: var(--amber); border-color: rgba(194,167,137,0.5); }
+.intent-btn.active-share  { background: rgba(241,202,99,0.12);  color: var(--cyan);  border-color: rgba(241,202,99,0.5); }
+
+/* ─── REPLY BADGES on ledger entries ─── */
+.reply-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  border-radius: 3px; padding: 1px 7px;
+  font-family: var(--mono); font-size: 10px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap;
+  flex-shrink: 0;
+}
+.reply-badge.request  { background: rgba(194,167,137,0.18); color: var(--amber); border: 1px solid rgba(194,167,137,0.4); }
+.reply-badge.share    { background: rgba(241,202,99,0.12);  color: var(--cyan);  border: 1px solid rgba(241,202,99,0.35); }
+.reply-badge.resolved { background: rgba(231,187,90,0.08);  color: var(--text-muted); border: 1px solid var(--border); text-decoration: line-through; }
+
+/* ─── REPLIES DUE PANEL ─── */
+.reply-due-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--amber);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-bottom: 10px;
+}
+.reply-due-card.share-type { border-left-color: var(--cyan); }
+.reply-due-card.resolved-type { border-left-color: var(--border); opacity: 0.65; }
+.rdc-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+.rdc-group { font-weight: 600; font-size: 14px; color: var(--text); }
+.rdc-meta { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; margin-bottom: 8px; }
+.rdc-from { font-size: 12px; color: var(--text-dim); margin-bottom: 6px; }
+.rdc-content { font-size: 12px; color: var(--text-muted); line-height: 1.6; margin-bottom: 10px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.rdc-content.expanded { display: block; }
+.rdc-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.rdc-reply-text { font-size: 12px; color: var(--lime); margin-top: 6px; padding: 8px 10px; background: rgba(231,187,90,0.06); border: 1px solid rgba(231,187,90,0.15); border-radius: var(--radius); line-height: 1.5; }
+
+/* ─── STAT CHIP clickable ─── */
+.stat-chip.replies-due { border-color: var(--amber); cursor: pointer; }
+.stat-chip.replies-due .val { color: var(--amber); }
+.stat-chip.replies-due:hover { background: rgba(194,167,137,0.12); }
+
 /* ── KW CAT FILTER TABS ── */
 .kw-cat-tab { background:var(--bg3); border:1px solid var(--border); color:var(--text-muted); border-radius:20px; padding:5px 12px; font-family:var(--mono); font-size:10px; letter-spacing:0.08em; text-transform:uppercase; cursor:pointer; transition:all 0.15s; min-height:32px; }
 .kw-cat-tab.active, .kw-cat-tab:hover { background:rgba(231,187,90,0.12); border-color:rgba(231,187,90,0.4); color:var(--lime); }
@@ -1198,6 +1252,10 @@ button, .tab, .template-chip, .keyword-chip, .icon-btn, .starter-item {
       <span>Posts</span>
       <span class="val" id="topStatPosts">0</span>
     </div>
+    <div class="stat-chip replies-due" id="topStatReplyChip" onclick="switchTab('replies', document.querySelector('.tab[onclick*=replies]'))" title="View Replies Due" style="display:none;">
+      <span>Replies Due</span>
+      <span class="val" id="topStatReplies">0</span>
+    </div>
     <div class="stat-chip">
       <span>Groups</span>
       <span class="val" id="topStatGroups">0</span>
@@ -1218,6 +1276,7 @@ button, .tab, .template-chip, .keyword-chip, .icon-btn, .starter-item {
     <div class="mnav-item active" onclick="switchTabMobile('generate')">🪄 <span>Generate</span></div>
     <div class="mnav-item" onclick="switchTabMobile('queue')">📋 <span>Queue</span> <span class="tab-badge" id="mQueueBadge">0</span></div>
     <div class="mnav-item" onclick="switchTabMobile('reply')">💬 <span>Reply</span></div>
+    <div class="mnav-item" onclick="switchTabMobile('replies')">🔔 <span>Replies Due</span> <span class="tab-badge" id="mRepliesBadge" style="background:var(--amber);display:none;">0</span></div>
     <div class="mnav-item" onclick="switchTabMobile('tracker')">🗺️ <span>Tracker</span></div>
     <div class="mnav-item" onclick="switchTabMobile('dashboard')">📊 <span>Dashboard</span></div>
     <div class="mnav-item" onclick="switchTabMobile('strategy')">🎯 <span>Strategy</span></div>
@@ -1232,6 +1291,7 @@ button, .tab, .template-chip, .keyword-chip, .icon-btn, .starter-item {
   <div class="tab active" onclick="switchTab('generate', this)">🪄 Generate</div>
   <div class="tab" onclick="switchTab('queue', this)">📋 Queue <span class="tab-badge" id="queueBadge">0</span></div>
   <div class="tab" onclick="switchTab('reply', this)">💬 Reply</div>
+  <div class="tab" onclick="switchTab('replies', this)">🔔 Replies Due <span class="tab-badge" id="repliesBadge" style="background:var(--amber);display:none;">0</span></div>
   <div class="tab" onclick="switchTab('tracker', this)">🗺️ Tracker</div>
   <div class="tab" onclick="switchTab('dashboard', this)">📊 Dashboard</div>
   <div class="tab" onclick="switchTab('strategy', this)">🎯 Strategy</div>
@@ -1627,6 +1687,21 @@ button, .tab, .template-chip, .keyword-chip, .icon-btn, .starter-item {
     </div>
   </div>
 
+  <!-- ═══ REPLIES DUE PANEL ═══ -->
+  <div id="panel-replies" class="panel">
+    <div class="section-header">
+      <div class="section-title">Replies Due</div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <select id="repliesFilter" onchange="renderRepliesPanel()" style="width:auto;margin-bottom:0;min-width:130px;">
+          <option value="pending">Pending Only</option>
+          <option value="all">Show All</option>
+        </select>
+      </div>
+    </div>
+    <div id="repliesPanelList">
+      <div class="no-data">No replies due. Quick Capture a screenshot and choose "Needs Reply" to track one.</div>
+    </div>
+  </div>
 
 </main>
 </div>
@@ -1882,7 +1957,14 @@ button, .tab, .template-chip, .keyword-chip, .icon-btn, .starter-item {
 <div class="modal-overlay" id="quickCaptureModal">
   <div class="modal qc-modal">
     <div class="modal-title" style="margin-bottom:6px;">⚡ Quick Capture</div>
-    <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">Paste post text or drop a screenshot — Groq will parse it and build the log entry for you.</p>
+    <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">Paste post text or drop a screenshot — tell Groq what this is, and it'll build the log entry for you.</p>
+
+    <!-- Intent toggle -->
+    <div class="intent-toggle">
+      <button class="intent-btn active-post" id="intentPost" onclick="setQCIntent('post')">✍️ I Posted This</button>
+      <button class="intent-btn" id="intentReq" onclick="setQCIntent('request')">🙋 Needs Reply<br><span style="font-size:10px;font-weight:400;opacity:0.8;">Service Request</span></button>
+      <button class="intent-btn" id="intentShare" onclick="setQCIntent('share')">🙏 Needs Reply<br><span style="font-size:10px;font-weight:400;opacity:0.8;">Sharing / Shoutout</span></button>
+    </div>
 
     <!-- Tab toggle -->
     <div class="qc-tabs">
@@ -1929,6 +2011,23 @@ button, .tab, .template-chip, .keyword-chip, .icon-btn, .starter-item {
     <div class="qc-confirm-actions">
       <button class="btn btn-ghost" onclick="dismissConfirm()">✕ Discard</button>
       <button class="btn btn-primary" onclick="confirmLog()" style="flex:1;">✅ Log It</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ RESOLVE REPLY MODAL ═══ -->
+<div class="modal-overlay" id="resolveReplyModal">
+  <div class="modal resolve-modal">
+    <div class="modal-title">✅ Mark Replied</div>
+    <input type="hidden" id="resolveReplyId">
+    <div style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">What did you reply? This gets saved to the entry so you can refer back later.</div>
+    <div>
+      <label>Your Reply <span style="color:var(--text-muted)">(paste what you sent)</span></label>
+      <textarea id="resolveReplyText" rows="5" placeholder="Paste your reply here..."></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeResolveModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmResolve()">✅ Mark Replied &amp; Save</button>
     </div>
   </div>
 </div>
@@ -2088,6 +2187,7 @@ function switchTab(name, el) {
   if (name === 'dashboard') renderDashboard();
   if (name === 'tracker') renderLedger();
   if (name === 'queue') renderQueue();
+  if (name === 'replies') renderRepliesPanel();
   if (name === 'strategy') { renderGroupLibrary(); renderKeywords(); }
   // scroll content to top on tab switch
   document.querySelector('.content')?.scrollTo({ top: 0, behavior: 'smooth' });
@@ -2596,13 +2696,18 @@ function renderLedger() {
     body.innerHTML = filtered.map(e => {
       const tags = (e.tags||[]).map(t => `<span class="entry-tag">${esc(t)}</span>`).join('');
       const notesPreview = (e.notes||'').length > 60 ? esc(e.notes).slice(0,60)+'…' : esc(e.notes||'');
+      const replyBadge = e.replyNeeded
+        ? e.replyResolved
+          ? `<span class="reply-badge resolved">${e.replyType === 'share' ? '🙏 Share' : '🙋 Request'} ✓</span> `
+          : `<span class="reply-badge ${e.replyType === 'share' ? 'share' : 'request'}">${e.replyType === 'share' ? '🙏 SHARE' : '🙋 REQUEST'}</span> `
+        : '';
       return `
       <tr class="ledger-row" id="lr-${e.id}" title="Click to expand">
         <td class="date-cell">${e.date}</td>
         <td><span class="platform-badge ${(e.platform||'').toLowerCase()}">${e.platform||'—'}</span></td>
         <td class="group-cell">${esc(e.group)}</td>
         <td style="color:var(--text-dim);font-size:13px;">${esc(e.parent||'—')}</td>
-        <td class="action-cell">${esc(e.action)}</td>
+        <td class="action-cell">${replyBadge}${esc(e.action)}</td>
         <td class="notes-cell">${tags}${tags&&notesPreview?' ':''}<span style="color:var(--text-muted);">${notesPreview}</span></td>
         <td class="ledger-col-btns">
           <div style="display:flex;gap:4px;">
@@ -2616,9 +2721,11 @@ function renderLedger() {
           <div class="expand-body">
             <div class="expand-label">Post / Notes</div>
             <div class="expand-text">${esc(e.notes||'(no content saved)')}</div>
+            ${e.replyResolved && e.replyText ? `<div class="expand-label" style="margin-top:10px;">Your Reply</div><div class="expand-text" style="border-color:rgba(231,187,90,0.25);color:var(--lime);">${esc(e.replyText)}</div>` : ''}
             <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;align-items:center;">
               <button class="btn btn-ghost btn-sm" onclick="toggleExpandRow(${e.id})">Collapse ▲</button>
               <button class="btn btn-secondary btn-sm" onclick="openEditEntry(${e.id})">✏ Edit Entry</button>
+              ${e.replyNeeded && !e.replyResolved ? `<button class="btn btn-sm" style="background:rgba(194,167,137,0.15);color:var(--amber);border:1px solid rgba(194,167,137,0.4);" onclick="openResolveModal(${e.id})">✅ Mark Replied</button>` : ''}
             </div>
           </div>
         </td>
@@ -2637,6 +2744,11 @@ function renderLedger() {
       cardWrap.innerHTML = filtered.map(e => {
         const notesPreview = (e.notes||'').length > 80 ? esc(e.notes).slice(0,80)+'…' : esc(e.notes||'');
         const tags = (e.tags||[]).map(t => `<span class="entry-tag">${esc(t)}</span>`).join('');
+        const replyBadge = e.replyNeeded
+          ? e.replyResolved
+            ? `<span class="reply-badge resolved">${e.replyType === 'share' ? '🙏 Share' : '🙋 Request'} ✓</span>`
+            : `<span class="reply-badge ${e.replyType === 'share' ? 'share' : 'request'}">${e.replyType === 'share' ? '🙏 SHARE' : '🙋 REQUEST'}</span>`
+          : '';
         return `<div class="ledger-card" onclick="toggleMobileCard(${e.id})">
           <div class="ledger-card-top">
             <div class="ledger-card-group">${esc(e.group)}</div>
@@ -2647,13 +2759,18 @@ function renderLedger() {
           </div>
           <div class="ledger-card-meta">
             <span class="platform-badge ${(e.platform||'').toLowerCase()}" style="font-size:10px;">${e.platform||'—'}</span>
+            ${replyBadge}
             <span class="action-cell" style="font-size:11px;">${esc(e.action)}</span>
             <span class="date-cell" style="font-size:11px;">${e.date}</span>
           </div>
           ${e.parent && e.parent !== '—' ? `<div style="font-size:12px;color:var(--text-dim);margin-bottom:4px;">${esc(e.parent)}</div>` : ''}
           ${tags ? `<div style="margin-bottom:4px;">${tags}</div>` : ''}
           ${notesPreview ? `<div class="ledger-card-notes">${notesPreview}</div>` : ''}
-          <div class="ledger-card-expand" id="mc-${e.id}">${esc(e.notes||'(no content saved)')}</div>
+          <div class="ledger-card-expand" id="mc-${e.id}">
+            ${esc(e.notes||'(no content saved)')}
+            ${e.replyResolved && e.replyText ? `<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);color:var(--lime);font-size:12px;"><strong>Your reply:</strong><br>${esc(e.replyText)}</div>` : ''}
+            ${e.replyNeeded && !e.replyResolved ? `<div style="margin-top:10px;" onclick="event.stopPropagation()"><button class="btn btn-sm" style="background:rgba(194,167,137,0.15);color:var(--amber);border:1px solid rgba(194,167,137,0.4);min-height:40px;" onclick="openResolveModal(${e.id})">✅ Mark Replied</button></div>` : ''}
+          </div>
         </div>`;
       }).join('');
     }
@@ -2842,6 +2959,7 @@ function renderDashboard() {
   const groups  = new Set(ledger.map(e => e.group)).size;
   const dms     = ledger.filter(e => e.action === 'Sent DM').length;
   const week    = ledger.filter(e => daysDiff(e.date) <= 7).length;
+  const pending = ledger.filter(e => e.replyNeeded && !e.replyResolved).length;
 
   document.getElementById('statsGrid').innerHTML = `
     <div class="stat-card stat-clickable" onclick="switchTab('tracker', document.querySelector('.tab[onclick*=tracker]'))" title="View Tracker">
@@ -2859,6 +2977,11 @@ function renderDashboard() {
     <div class="stat-card stat-clickable" onclick="switchTab('tracker', document.querySelector('.tab[onclick*=tracker]'))" title="View This Week">
       <div class="s-val">${week}</div><div class="s-label">This Week</div>
       <div class="s-hint">View Tracker →</div>
+    </div>
+    <div class="stat-card stat-clickable" style="${pending > 0 ? 'border-color:rgba(194,167,137,0.4);' : ''}" onclick="switchTab('replies', document.querySelector('.tab[onclick*=replies]'))" title="View Replies Due">
+      <div class="s-val" style="${pending > 0 ? 'color:var(--amber);' : ''}">${pending}</div>
+      <div class="s-label" style="${pending > 0 ? 'color:var(--amber);' : ''}">Replies Due</div>
+      <div class="s-hint">View Replies →</div>
     </div>
   `;
 
@@ -2891,6 +3014,11 @@ function renderDashboard() {
 function updateTopStats() {
   document.getElementById('topStatPosts').textContent  = ledger.length;
   document.getElementById('topStatGroups').textContent = new Set(ledger.map(e => e.group)).size;
+  const pending = ledger.filter(e => e.replyNeeded && !e.replyResolved).length;
+  document.getElementById('topStatReplies').textContent = pending;
+  const chip = document.getElementById('topStatReplyChip');
+  if (chip) chip.style.display = pending > 0 ? 'flex' : 'none';
+  updateRepliesBadge();
 }
 
 function clearAllData() {
@@ -3922,8 +4050,9 @@ async function callGroq(messages, model) {
 // ═══════════════════════════════════════
 // QUICK CAPTURE
 // ═══════════════════════════════════════
-let qcMode = 'text';
-let qcImageB64 = null;
+let qcMode   = 'text';
+let qcIntent = 'post'; // 'post' | 'request' | 'share'
+let qcImageB64  = null;
 let qcImageMime = null;
 let _pendingEntry = null;
 
@@ -3931,7 +4060,8 @@ function openQuickCapture() {
   document.getElementById('qcPasteText').value = '';
   clearQCImage();
   setQCMode('text');
-  setQCStatus('idle', 'Ready — paste text or upload a screenshot.');
+  setQCIntent('post');
+  setQCStatus('idle', 'Ready — choose intent, then paste text or upload a screenshot.');
   document.getElementById('qcParseBtn').disabled = false;
   document.getElementById('quickCaptureModal').classList.add('open');
 }
@@ -3941,6 +4071,16 @@ function closeQuickCapture() {
 (function(){var _m=document.getElementById('quickCaptureModal');if(_m)_m.addEventListener('click', function(e) {
   if (e.target === this) closeQuickCapture();
 });})();
+
+function setQCIntent(intent) {
+  qcIntent = intent;
+  ['intentPost','intentReq','intentShare'].forEach(id => {
+    document.getElementById(id).className = 'intent-btn';
+  });
+  if (intent === 'post')    document.getElementById('intentPost').classList.add('active-post');
+  if (intent === 'request') document.getElementById('intentReq').classList.add('active-req');
+  if (intent === 'share')   document.getElementById('intentShare').classList.add('active-share');
+}
 
 function setQCMode(mode) {
   qcMode = mode;
@@ -3998,13 +4138,29 @@ function clearQCImage() {
 async function runQuickCapture() {
   const knownGroups = [...new Set(ledger.map(e => e.group)), ...groupLibrary.map(g => g.name)];
 
+  // Build intent-specific system prompt
+  let intentContext = '';
+  if (qcIntent === 'post') {
+    intentContext = `This is a post or comment made BY the user. Log it as an action taken.
+Return action as one of: Commented Post|Replied to Comment|Original Post|Sent DM|Resource Post`;
+  } else if (qcIntent === 'request') {
+    intentContext = `This is a post by SOMEONE ELSE asking about services, tools, or help. The user needs to reply to them.
+Focus on: who posted (parent field), what they're asking for, what group it's in.
+Return action as: "Needs Reply – Request"`;
+  } else if (qcIntent === 'share') {
+    intentContext = `This is a post by SOMEONE ELSE sharing, tagging, shouting out, or promoting the user's app/brand. The user needs to thank them.
+Focus on: who is sharing (parent field), what they said about the product, what group or context.
+Return action as: "Needs Reply – Share"`;
+  }
+
   const systemPrompt = `You extract structured data from social media posts or screenshots.
+${intentContext}
 Return ONLY valid JSON with these exact keys:
 {
   "group": "best guess at group/community name or empty string",
   "platform": "Facebook|Instagram|X|Reddit|LinkedIn|Other",
   "parent": "person name or topic being discussed, brief",
-  "action": "Commented Post|Replied to Comment|Original Post|Sent DM|Resource Post",
+  "action": "the action value as described above",
   "date": "YYYY-MM-DD format of today if not clear",
   "notes": "the full post or comment text, verbatim if possible"
 }
@@ -4018,7 +4174,6 @@ Today is ${today()}. Be concise. No markdown, no explanation — just the JSON o
     let raw;
 
     if (qcMode === 'image' && qcImageB64) {
-      // Vision call — use llama-3.2-11b-vision-preview
       const messages = [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: [
@@ -4026,7 +4181,6 @@ Today is ${today()}. Be concise. No markdown, no explanation — just the JSON o
           { type: 'text', text: 'Extract the post data from this screenshot and return the JSON.' }
         ]}
       ];
-      // Vision models don't support response_format json_object — call differently
       const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + settings.groqKey },
@@ -4041,7 +4195,6 @@ Today is ${today()}. Be concise. No markdown, no explanation — just the JSON o
       const data = await res.json();
       raw = data.choices?.[0]?.message?.content || '{}';
     } else {
-      // Text call
       const text = document.getElementById('qcPasteText').value.trim();
       if (!text) { setQCStatus('error', 'Nothing to parse — paste some text first.'); document.getElementById('qcParseBtn').disabled = false; return; }
       const messages = [
@@ -4051,19 +4204,23 @@ Today is ${today()}. Be concise. No markdown, no explanation — just the JSON o
       raw = await callGroq(messages);
     }
 
-    // Strip any markdown fences
     const clean = raw.replace(/```json|```/g, '').trim();
     const parsed = JSON.parse(clean);
 
     _pendingEntry = {
-      id:       Date.now(),
-      group:    parsed.group    || '(unknown group)',
-      platform: parsed.platform || 'Facebook',
-      parent:   parsed.parent   || '',
-      action:   parsed.action   || 'Commented Post',
-      date:     parsed.date     || today(),
-      notes:    parsed.notes    || '',
-      tags:     []
+      id:           Date.now(),
+      group:        parsed.group    || '(unknown group)',
+      platform:     parsed.platform || 'Facebook',
+      parent:       parsed.parent   || '',
+      action:       parsed.action   || (qcIntent === 'post' ? 'Commented Post' : qcIntent === 'request' ? 'Needs Reply – Request' : 'Needs Reply – Share'),
+      date:         parsed.date     || today(),
+      notes:        parsed.notes    || '',
+      tags:         [],
+      replyNeeded:  qcIntent !== 'post',
+      replyType:    qcIntent !== 'post' ? qcIntent : null,
+      replyResolved: false,
+      replyText:    null,
+      replyDate:    null
     };
 
     closeQuickCapture();
@@ -4076,18 +4233,24 @@ Today is ${today()}. Be concise. No markdown, no explanation — just the JSON o
 }
 
 function showConfirmCard(entry) {
+  const intentLabel = entry.replyNeeded
+    ? (entry.replyType === 'share' ? '🙏 Needs Reply: Share' : '🙋 Needs Reply: Request')
+    : '✍️ My Post';
+  const intentColor = entry.replyType === 'share' ? 'var(--cyan)' : entry.replyNeeded ? 'var(--amber)' : 'var(--lime)';
+
   const fields = [
-    { label: 'Group',    val: entry.group },
-    { label: 'Platform', val: entry.platform },
-    { label: 'Action',   val: entry.action },
-    { label: 'Date',     val: entry.date },
-    { label: 'Topic',    val: entry.parent || '—' },
-    { label: 'Content',  val: entry.notes, wide: true }
+    { label: 'Intent',    val: intentLabel },
+    { label: 'Group',     val: entry.group },
+    { label: 'Platform',  val: entry.platform },
+    { label: 'Action',    val: entry.action },
+    { label: 'Date',      val: entry.date },
+    { label: entry.replyNeeded ? 'Posted By' : 'Topic', val: entry.parent || '—' },
+    { label: 'Content',   val: entry.notes, wide: true }
   ];
   document.getElementById('qcConfirmFields').innerHTML = fields.map(f => `
     <div class="qc-field${f.wide ? ' notes-field' : ''}">
       <div class="qc-field-label">${f.label}</div>
-      <div class="qc-field-val">${esc(f.val)}</div>
+      <div class="qc-field-val" style="${f.label === 'Intent' ? 'color:' + intentColor + ';' : ''}">${esc(f.val)}</div>
     </div>`).join('');
   document.getElementById('qcConfirmOverlay').classList.add('show');
 }
@@ -4104,7 +4267,10 @@ function confirmLog() {
   updateGroupSuggestions();
   updateTopStats();
   dismissConfirm();
-  toast('✅ Entry logged via Quick Capture!');
+  const msg = _pendingEntry.replyNeeded
+    ? (_pendingEntry.replyType === 'share' ? '🙏 Share logged — reply due!' : '🙋 Request logged — reply due!')
+    : '✅ Entry logged via Quick Capture!';
+  toast(msg);
 }
 
 function setQCStatus(state, msg) {
@@ -4114,6 +4280,101 @@ function setQCStatus(state, msg) {
             : state==='error'  ? '<div class="pulse error"></div>'
             : '<div class="pulse idle"></div>';
   s.innerHTML = dot + esc(msg);
+}
+
+// ═══════════════════════════════════════
+// REPLIES DUE PANEL
+// ═══════════════════════════════════════
+function updateRepliesBadge() {
+  const pending = ledger.filter(e => e.replyNeeded && !e.replyResolved).length;
+  ['repliesBadge','mRepliesBadge'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = pending;
+    el.style.display = pending > 0 ? 'inline-flex' : 'none';
+  });
+}
+
+function renderRepliesPanel() {
+  const filterVal = document.getElementById('repliesFilter')?.value || 'pending';
+  const entries = ledger
+    .filter(e => e.replyNeeded && (filterVal === 'all' || !e.replyResolved))
+    .sort((a, b) => {
+      // Pending first, then by date desc
+      if (a.replyResolved !== b.replyResolved) return a.replyResolved ? 1 : -1;
+      return new Date(b.date) - new Date(a.date) || b.id - a.id;
+    });
+
+  const el = document.getElementById('repliesPanelList');
+  if (!entries.length) {
+    el.innerHTML = filterVal === 'pending'
+      ? '<div class="no-data">No pending replies — you\'re all caught up! 🎉</div>'
+      : '<div class="no-data">No reply entries logged yet. Quick Capture a screenshot and choose "Needs Reply".</div>';
+    return;
+  }
+
+  el.innerHTML = entries.map(e => {
+    const isShare    = e.replyType === 'share';
+    const isResolved = !!e.replyResolved;
+    const cardClass  = isResolved ? 'reply-due-card resolved-type' : isShare ? 'reply-due-card share-type' : 'reply-due-card';
+    const badgeClass = isResolved ? 'reply-badge resolved' : isShare ? 'reply-badge share' : 'reply-badge request';
+    const badgeLabel = isShare ? '🙏 Share' : '🙋 Request';
+
+    return `<div class="${cardClass}">
+      <div class="rdc-top">
+        <div class="rdc-group">${esc(e.group)}</div>
+        <span class="${badgeClass}">${badgeLabel}${isResolved ? ' ✓' : ''}</span>
+      </div>
+      <div class="rdc-meta">
+        <span class="platform-badge ${(e.platform||'').toLowerCase()}" style="font-size:10px;">${e.platform||'—'}</span>
+        <span style="font-family:var(--mono);font-size:10px;color:var(--text-muted);">${e.date}</span>
+      </div>
+      ${e.parent && e.parent !== '—' ? `<div class="rdc-from">From: <strong style="color:var(--text);">${esc(e.parent)}</strong></div>` : ''}
+      <div class="rdc-content" id="rdc-notes-${e.id}">${esc(e.notes||'(no content)')}</div>
+      ${isResolved && e.replyText ? `<div class="rdc-reply-text">Your reply: ${esc(e.replyText)}</div>` : ''}
+      <div class="rdc-actions">
+        <button class="btn btn-ghost btn-sm" onclick="rdcToggleExpand(${e.id})">Expand</button>
+        ${!isResolved ? `<button class="btn btn-sm" style="background:rgba(194,167,137,0.15);color:var(--amber);border:1px solid rgba(194,167,137,0.4);min-height:36px;" onclick="openResolveModal(${e.id})">✅ Mark Replied</button>` : ''}
+        <button class="btn btn-ghost btn-sm" onclick="openEditEntry(${e.id})">✏ Edit</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function rdcToggleExpand(id) {
+  const el = document.getElementById('rdc-notes-' + id);
+  if (el) el.classList.toggle('expanded');
+}
+
+// ═══════════════════════════════════════
+// RESOLVE REPLY MODAL
+// ═══════════════════════════════════════
+function openResolveModal(id) {
+  document.getElementById('resolveReplyId').value = id;
+  document.getElementById('resolveReplyText').value = '';
+  document.getElementById('resolveReplyModal').classList.add('open');
+}
+function closeResolveModal() {
+  document.getElementById('resolveReplyModal').classList.remove('open');
+}
+document.getElementById('resolveReplyModal').addEventListener('click', function(e) {
+  if (e.target === this) closeResolveModal();
+});
+function confirmResolve() {
+  const id    = Number(document.getElementById('resolveReplyId').value);
+  const text  = document.getElementById('resolveReplyText').value.trim();
+  if (!text)  { toast('⚠ Paste your reply first'); return; }
+  const idx   = ledger.findIndex(e => e.id === id);
+  if (idx < 0) return;
+  ledger[idx].replyResolved = true;
+  ledger[idx].replyText     = text;
+  ledger[idx].replyDate     = today();
+  DB.set('ledger', ledger);
+  updateTopStats();
+  closeResolveModal();
+  renderRepliesPanel();
+  renderLedger();
+  toast('✅ Reply logged!');
 }
 
 // ═══════════════════════════════════════
