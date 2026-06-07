@@ -1154,9 +1154,7 @@ button, .tab, .template-chip, .keyword-chip, .icon-btn, .starter-item {
 
 
 /* ─── INTENT TOGGLE (Quick Capture) ─── */
-.intent-toggle {
-  display: flex; gap: 6px; margin-bottom: 14px;
-}
+.intent-toggle { display: flex; gap: 6px; margin-bottom: 14px; }
 .intent-btn {
   flex: 1; padding: 10px 8px;
   font-family: var(--head); font-size: 12px; font-weight: 600;
@@ -1166,17 +1164,16 @@ button, .tab, .template-chip, .keyword-chip, .icon-btn, .starter-item {
   cursor: pointer; transition: all 0.15s; line-height: 1.3;
   min-height: 52px; text-align: center;
 }
-.intent-btn.active-post   { background: rgba(231,187,90,0.12); color: var(--lime);  border-color: rgba(231,187,90,0.5); }
-.intent-btn.active-req    { background: rgba(194,167,137,0.15); color: var(--amber); border-color: rgba(194,167,137,0.5); }
-.intent-btn.active-share  { background: rgba(241,202,99,0.12);  color: var(--cyan);  border-color: rgba(241,202,99,0.5); }
+.intent-btn.active-post  { background: rgba(231,187,90,0.12); color: var(--lime);  border-color: rgba(231,187,90,0.5); }
+.intent-btn.active-req   { background: rgba(194,167,137,0.15); color: var(--amber); border-color: rgba(194,167,137,0.5); }
+.intent-btn.active-share { background: rgba(241,202,99,0.12);  color: var(--cyan);  border-color: rgba(241,202,99,0.5); }
 
 /* ─── REPLY BADGES on ledger entries ─── */
 .reply-badge {
   display: inline-flex; align-items: center; gap: 4px;
   border-radius: 3px; padding: 1px 7px;
   font-family: var(--mono); font-size: 10px; font-weight: 700;
-  letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap;
-  flex-shrink: 0;
+  letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; flex-shrink: 0;
 }
 .reply-badge.request  { background: rgba(194,167,137,0.18); color: var(--amber); border: 1px solid rgba(194,167,137,0.4); }
 .reply-badge.share    { background: rgba(241,202,99,0.12);  color: var(--cyan);  border: 1px solid rgba(241,202,99,0.35); }
@@ -1184,25 +1181,22 @@ button, .tab, .template-chip, .keyword-chip, .icon-btn, .starter-item {
 
 /* ─── REPLIES DUE PANEL ─── */
 .reply-due-card {
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--amber);
-  border-radius: var(--radius);
-  padding: 14px 16px;
-  margin-bottom: 10px;
+  background: var(--bg2); border: 1px solid var(--border);
+  border-left: 3px solid var(--amber); border-radius: var(--radius);
+  padding: 14px 16px; margin-bottom: 10px;
 }
-.reply-due-card.share-type { border-left-color: var(--cyan); }
+.reply-due-card.share-type    { border-left-color: var(--cyan); }
 .reply-due-card.resolved-type { border-left-color: var(--border); opacity: 0.65; }
-.rdc-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
-.rdc-group { font-weight: 600; font-size: 14px; color: var(--text); }
-.rdc-meta { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; margin-bottom: 8px; }
-.rdc-from { font-size: 12px; color: var(--text-dim); margin-bottom: 6px; }
+.rdc-top    { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+.rdc-group  { font-weight: 600; font-size: 14px; color: var(--text); }
+.rdc-meta   { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; margin-bottom: 8px; }
+.rdc-from   { font-size: 12px; color: var(--text-dim); margin-bottom: 6px; }
 .rdc-content { font-size: 12px; color: var(--text-muted); line-height: 1.6; margin-bottom: 10px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .rdc-content.expanded { display: block; }
 .rdc-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 .rdc-reply-text { font-size: 12px; color: var(--lime); margin-top: 6px; padding: 8px 10px; background: rgba(231,187,90,0.06); border: 1px solid rgba(231,187,90,0.15); border-radius: var(--radius); line-height: 1.5; }
 
-/* ─── STAT CHIP clickable ─── */
+/* ─── STAT CHIP clickable replies ─── */
 .stat-chip.replies-due { border-color: var(--amber); cursor: pointer; }
 .stat-chip.replies-due .val { color: var(--amber); }
 .stat-chip.replies-due:hover { background: rgba(194,167,137,0.12); }
@@ -1422,6 +1416,15 @@ button, .tab, .template-chip, .keyword-chip, .icon-btn, .starter-item {
             <option value="helpful">Helpful & Practical</option>
             <option value="excited">Excited About jVox</option>
             <option value="concise">Short & Natural</option>
+          </select>
+        </div>
+        <div>
+          <label>Length</label>
+          <select id="replyLength">
+            <option value="single">Single sentence</option>
+            <option value="short" selected>1 paragraph (~60 words)</option>
+            <option value="medium">2 paragraphs (~120 words)</option>
+            <option value="long">3+ paragraphs</option>
           </select>
         </div>
         <div>
@@ -1691,12 +1694,10 @@ button, .tab, .template-chip, .keyword-chip, .icon-btn, .starter-item {
   <div id="panel-replies" class="panel">
     <div class="section-header">
       <div class="section-title">Replies Due</div>
-      <div style="display:flex;gap:8px;align-items:center;">
-        <select id="repliesFilter" onchange="renderRepliesPanel()" style="width:auto;margin-bottom:0;min-width:130px;">
-          <option value="pending">Pending Only</option>
-          <option value="all">Show All</option>
-        </select>
-      </div>
+      <select id="repliesFilter" onchange="renderRepliesPanel()" style="width:auto;margin-bottom:0;min-width:130px;">
+        <option value="pending">Pending Only</option>
+        <option value="all">Show All</option>
+      </select>
     </div>
     <div id="repliesPanelList">
       <div class="no-data">No replies due. Quick Capture a screenshot and choose "Needs Reply" to track one.</div>
@@ -2017,10 +2018,10 @@ button, .tab, .template-chip, .keyword-chip, .icon-btn, .starter-item {
 
 <!-- ═══ RESOLVE REPLY MODAL ═══ -->
 <div class="modal-overlay" id="resolveReplyModal">
-  <div class="modal resolve-modal">
+  <div class="modal" style="max-width:480px;">
     <div class="modal-title">✅ Mark Replied</div>
     <input type="hidden" id="resolveReplyId">
-    <div style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">What did you reply? This gets saved to the entry so you can refer back later.</div>
+    <div style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">What did you reply? Saved to the entry so you can refer back later.</div>
     <div>
       <label>Your Reply <span style="color:var(--text-muted)">(paste what you sent)</span></label>
       <textarea id="resolveReplyText" rows="5" placeholder="Paste your reply here..."></textarea>
@@ -2092,7 +2093,7 @@ button, .tab, .template-chip, .keyword-chip, .icon-btn, .starter-item {
       </div>
       <button class="icon-btn" onclick="closeKwPostSheet()">&#x2715;</button>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;">
       <div><label>Platform</label>
         <select id="kwPostPlatform" style="margin-bottom:0;">
           <option value="facebook">Facebook</option>
@@ -2107,6 +2108,13 @@ button, .tab, .template-chip, .keyword-chip, .icon-btn, .starter-item {
           <option value="empathetic">Empathetic</option>
           <option value="story">Personal Story</option>
           <option value="concise">Short &amp; Direct</option>
+        </select></div>
+      <div><label>Length</label>
+        <select id="kwPostLength" style="margin-bottom:0;">
+          <option value="single">Single sentence</option>
+          <option value="short">1 paragraph</option>
+          <option value="medium" selected>2–3 paragraphs</option>
+          <option value="long">4+ paragraphs</option>
         </select></div>
     </div>
     <div style="margin-bottom:12px;">
@@ -2546,8 +2554,15 @@ async function generateReply(isRegen) {
   if (!input) { toast('⚠ Paste a post first'); return; }
 
   const tone   = document.getElementById('replyTone').value;
+  const length = document.getElementById('replyLength').value;
   const group  = document.getElementById('replyGroup').value.trim();
-  const toneLabels = { empathetic:'empathetic and warm', helpful:'helpful and practical', excited:'excited about jVox', concise:'short and natural (2–3 sentences max)' };
+  const toneLabels = { empathetic:'empathetic and warm', helpful:'helpful and practical', excited:'excited about jVox', concise:'short and natural' };
+  const lengthInstr = {
+    single: 'EXACTLY one sentence. Maximum 25 words. No exceptions.',
+    short:  'EXACTLY one paragraph. Maximum 70 words. Do not add a second paragraph.',
+    medium: '2 paragraphs. Maximum 130 words total.',
+    long:   '3 or more paragraphs. Can be detailed.'
+  };
   const regenClause = isRegen && lastReply ? `Previous reply was: "${lastReply.slice(0,200)}". Write something DIFFERENT.` : '';
 
   const prompt = `You are replying to a Facebook community post on behalf of ${settings.brand} founder.
@@ -2560,13 +2575,14 @@ The post you're replying to:
 ${input}
 """
 
+LENGTH REQUIREMENT (this overrides everything else): ${lengthInstr[length]}
+
 Write a ${toneLabels[tone]} reply that:
 - Acknowledges their situation with empathy first
 - Naturally (not forcefully) mentions ${settings.brand} as a free resource if genuinely relevant
 - Ends with the URL (${settings.url}) only if mentioning the app
 - Feels like a real person commenting, NOT a marketing bot
 - Does NOT start with "I" as the first word
-- Is appropriately concise for a comment reply
 
 ${regenClause}
 
@@ -3532,10 +3548,17 @@ async function runKwPostGenerate() {
   if (!_kwPostSeed) return;
   var platform = document.getElementById('kwPostPlatform').value;
   var tone     = document.getElementById('kwPostTone').value;
+  var length   = document.getElementById('kwPostLength').value;
   var context  = document.getElementById('kwPostContext').value.trim();
   var pLabels  = {facebook:'Facebook',instagram:'Instagram',x:'X (Twitter)',reddit:'Reddit',linkedin:'LinkedIn'};
   var tLabels  = {warm_personal:'warm and personal',empathetic:'deeply empathetic',story:'a personal founder story',concise:'concise and direct'};
-  var pGuide   = {facebook:'3-4 paragraphs, conversational, emojis ok',instagram:'punchy opener, 3-5 hashtags at end',x:'under 280 characters, hook in first 8 words',reddit:'authentic, no emojis, no marketing language',linkedin:'professional but human, thought leadership angle'};
+  var pGuide   = {facebook:'conversational, emojis ok',instagram:'punchy opener, 3-5 hashtags at end',x:'hook in first 8 words',reddit:'authentic, no emojis, no marketing language',linkedin:'professional but human, thought leadership angle'};
+  var lengthInstr = {
+    single: 'EXACTLY one sentence. Maximum 25 words. No exceptions.',
+    short:  'EXACTLY one paragraph. Maximum 70 words. Do not write a second paragraph.',
+    medium: '2–3 paragraphs. Maximum 200 words total.',
+    long:   '4 or more paragraphs. Can be detailed and thorough.'
+  };
   var catCtx   = {
     'Pain Point':       'Acknowledge the pain first, then naturally introduce jVox as something that helped.',
     'Looking For Tool': 'Lead with the solution. Keep it genuine, not salesy.',
@@ -3548,7 +3571,8 @@ async function runKwPostGenerate() {
     'Keyword seed: "' + _kwPostSeed.text + '" (category: ' + _kwPostSeed.cat + ')\n' +
     'Angle: ' + (catCtx[_kwPostSeed.cat] || 'Be authentic and helpful.') + '\n' +
     'Tone: ' + tLabels[tone] + '\n' +
-    'Format: ' + pGuide[platform] + '\n' +
+    'Style: ' + pGuide[platform] + '\n' +
+    'LENGTH REQUIREMENT (overrides everything): ' + lengthInstr[length] + '\n' +
     (context ? 'Additional context: ' + context + '\n' : '') +
     '\nWrite ONLY the post. No labels, no quotes, no preamble.';
   document.getElementById('kwPostBtnIcon').innerHTML = '<span class="spinner"></span>';
@@ -4138,18 +4162,17 @@ function clearQCImage() {
 async function runQuickCapture() {
   const knownGroups = [...new Set(ledger.map(e => e.group)), ...groupLibrary.map(g => g.name)];
 
-  // Build intent-specific system prompt
   let intentContext = '';
   if (qcIntent === 'post') {
     intentContext = `This is a post or comment made BY the user. Log it as an action taken.
 Return action as one of: Commented Post|Replied to Comment|Original Post|Sent DM|Resource Post`;
   } else if (qcIntent === 'request') {
-    intentContext = `This is a post by SOMEONE ELSE asking about services, tools, or help. The user needs to reply to them.
+    intentContext = `This is a post by SOMEONE ELSE asking about services, tools, or help. The user needs to reply.
 Focus on: who posted (parent field), what they're asking for, what group it's in.
 Return action as: "Needs Reply – Request"`;
   } else if (qcIntent === 'share') {
-    intentContext = `This is a post by SOMEONE ELSE sharing, tagging, shouting out, or promoting the user's app/brand. The user needs to thank them.
-Focus on: who is sharing (parent field), what they said about the product, what group or context.
+    intentContext = `This is a post by SOMEONE ELSE sharing, tagging, or shouting out the user's app/brand. The user needs to thank them.
+Focus on: who is sharing (parent field), what they said, what group or context.
 Return action as: "Needs Reply – Share"`;
   }
 
@@ -4172,7 +4195,6 @@ Today is ${today()}. Be concise. No markdown, no explanation — just the JSON o
 
   try {
     let raw;
-
     if (qcMode === 'image' && qcImageB64) {
       const messages = [
         { role: 'system', content: systemPrompt },
@@ -4184,12 +4206,7 @@ Today is ${today()}. Be concise. No markdown, no explanation — just the JSON o
       const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + settings.groqKey },
-        body: JSON.stringify({
-          model: 'meta-llama/llama-4-scout-17b-16e-instruct',
-          messages,
-          temperature: 0.1,
-          max_tokens: 500
-        })
+        body: JSON.stringify({ model: 'meta-llama/llama-4-scout-17b-16e-instruct', messages, temperature: 0.1, max_tokens: 500 })
       });
       if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e?.error?.message||'Groq vision error '+res.status); }
       const data = await res.json();
@@ -4197,11 +4214,10 @@ Today is ${today()}. Be concise. No markdown, no explanation — just the JSON o
     } else {
       const text = document.getElementById('qcPasteText').value.trim();
       if (!text) { setQCStatus('error', 'Nothing to parse — paste some text first.'); document.getElementById('qcParseBtn').disabled = false; return; }
-      const messages = [
+      raw = await callGroq([
         { role: 'system', content: systemPrompt },
         { role: 'user', content: 'Extract data from this post: ' + text }
-      ];
-      raw = await callGroq(messages);
+      ]);
     }
 
     const clean = raw.replace(/```json|```/g, '').trim();
@@ -4237,15 +4253,14 @@ function showConfirmCard(entry) {
     ? (entry.replyType === 'share' ? '🙏 Needs Reply: Share' : '🙋 Needs Reply: Request')
     : '✍️ My Post';
   const intentColor = entry.replyType === 'share' ? 'var(--cyan)' : entry.replyNeeded ? 'var(--amber)' : 'var(--lime)';
-
   const fields = [
-    { label: 'Intent',    val: intentLabel },
-    { label: 'Group',     val: entry.group },
-    { label: 'Platform',  val: entry.platform },
-    { label: 'Action',    val: entry.action },
-    { label: 'Date',      val: entry.date },
+    { label: 'Intent',   val: intentLabel },
+    { label: 'Group',    val: entry.group },
+    { label: 'Platform', val: entry.platform },
+    { label: 'Action',   val: entry.action },
+    { label: 'Date',     val: entry.date },
     { label: entry.replyNeeded ? 'Posted By' : 'Topic', val: entry.parent || '—' },
-    { label: 'Content',   val: entry.notes, wide: true }
+    { label: 'Content',  val: entry.notes, wide: true }
   ];
   document.getElementById('qcConfirmFields').innerHTML = fields.map(f => `
     <div class="qc-field${f.wide ? ' notes-field' : ''}">
@@ -4300,11 +4315,9 @@ function renderRepliesPanel() {
   const entries = ledger
     .filter(e => e.replyNeeded && (filterVal === 'all' || !e.replyResolved))
     .sort((a, b) => {
-      // Pending first, then by date desc
       if (a.replyResolved !== b.replyResolved) return a.replyResolved ? 1 : -1;
       return new Date(b.date) - new Date(a.date) || b.id - a.id;
     });
-
   const el = document.getElementById('repliesPanelList');
   if (!entries.length) {
     el.innerHTML = filterVal === 'pending'
@@ -4312,14 +4325,12 @@ function renderRepliesPanel() {
       : '<div class="no-data">No reply entries logged yet. Quick Capture a screenshot and choose "Needs Reply".</div>';
     return;
   }
-
   el.innerHTML = entries.map(e => {
     const isShare    = e.replyType === 'share';
     const isResolved = !!e.replyResolved;
     const cardClass  = isResolved ? 'reply-due-card resolved-type' : isShare ? 'reply-due-card share-type' : 'reply-due-card';
     const badgeClass = isResolved ? 'reply-badge resolved' : isShare ? 'reply-badge share' : 'reply-badge request';
     const badgeLabel = isShare ? '🙏 Share' : '🙋 Request';
-
     return `<div class="${cardClass}">
       <div class="rdc-top">
         <div class="rdc-group">${esc(e.group)}</div>
@@ -4361,10 +4372,10 @@ document.getElementById('resolveReplyModal').addEventListener('click', function(
   if (e.target === this) closeResolveModal();
 });
 function confirmResolve() {
-  const id    = Number(document.getElementById('resolveReplyId').value);
-  const text  = document.getElementById('resolveReplyText').value.trim();
-  if (!text)  { toast('⚠ Paste your reply first'); return; }
-  const idx   = ledger.findIndex(e => e.id === id);
+  const id   = Number(document.getElementById('resolveReplyId').value);
+  const text = document.getElementById('resolveReplyText').value.trim();
+  if (!text) { toast('⚠ Paste your reply first'); return; }
+  const idx  = ledger.findIndex(e => e.id === id);
   if (idx < 0) return;
   ledger[idx].replyResolved = true;
   ledger[idx].replyText     = text;
@@ -4376,6 +4387,7 @@ function confirmResolve() {
   renderLedger();
   toast('✅ Reply logged!');
 }
+
 
 // ═══════════════════════════════════════
 // SWIPE TO CLOSE MOBILE NAV
